@@ -2,6 +2,7 @@
 PYTHON_DIR = /mbt/local/pkg/miniconda3/bin
 PYTHON = $(PYTHON_DIR)/python3
 NAMESPACE = jarrow
+JAVADOC_FLAGS = -Xdoclint:none
 
 FLATC = /mbt/github/flatbuffers/flatc
 
@@ -14,12 +15,18 @@ JSRC = \
 
 FBSRC = `find fbs -name "*.java" -print`
 
-build: $(JARFILE) data.fea
+build: $(JARFILE) javadocs data.fea
 
 run: $(JARFILE) data.fea
 	java -classpath $(JARFILE) Dump data.fea
 
 jar: $(JARFILE)
+
+javadocs: $(JSRC)
+	rm -rf javadocs
+	mkdir javadocs
+	javadoc $(JAVADOC_FLAGS) -quiet \
+                -d javadocs $(JSRC) $(FBSRC)
 
 data.fea: data.py
 	$(PYTHON) data.py
@@ -42,11 +49,11 @@ $(JARFILE): $(JSRC) $(STIL_JAR)
 	rm -rf tmp
 
 clean:
-	rm -f data.fea $(JARFILE)
-	rm -rf tmp
+	rm -f $(JARFILE) $(NAMESPACE)_metadata.fbs
+	rm -rf tmp javadocs
 
 veryclean: clean
-	rm -f $(NAMESPACE)_metadata.fbs
+	rm -f $(NAMESPACE)_metadata.fbs data.fea
 	rm -rf fbs/jarrow
 
 
