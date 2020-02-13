@@ -57,7 +57,7 @@ $(NAMESPACE)_metadata.fbs: feather_metadata.fbs
 	sed -e 's/^namespace.*/namespace $(NAMESPACE).fbs;/' \
             <feather_metadata.fbs >$@
 
-$(FBSRC): $(NAMESPACE)_metadata.fbs
+fbs/$(NAMESPACE): $(NAMESPACE)_metadata.fbs
 	rm -rf fbs/$(NAMESPACE)
 	mkdir -p fbs/$(NAMESPACE)
 	cd fbs; \
