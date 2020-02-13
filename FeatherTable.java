@@ -37,8 +37,7 @@ public class FeatherTable {
             byte type = parr.type();
             long nNull = parr.nullCount();
             String userMeta = col.userMetadata();
-            Decoder<?> decoder =
-                Decoder.createDecoder( parr.type(), nNull > 0 );
+            Decoder<?> decoder = Decoder.createDecoder( parr.type() );
             BufMapper mapper =
                 new BufMapper( channel, parr.offset(), parr.totalBytes() );
             columns_[ ic ] =

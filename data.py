@@ -3,10 +3,10 @@ import pyarrow.feather as feather
 
 d = {
    "ic": [1,2,3,4],
-   "dc": [10.,11.,12.,13.],
-   "bc": [True, False, False, True],
+   "dc": [10.,None,12.,13.],
+   "bc": [True, None, False, True],
 }
-cols = ["icol", "dcol"];
+cols = ["bcol", "icol", "dcol"];
 
 df = pandas.DataFrame(data=d)
 
