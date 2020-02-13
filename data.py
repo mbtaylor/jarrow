@@ -5,6 +5,7 @@ d = {
    "ic": [1,2,3,4],
    "dc": [10.,None,12.,13.],
    "bc": [True, None, False, True],
+   "sc": ["red", "blue", "green", "puce"],
 }
 cols = ["bcol", "icol", "dcol"];
 
