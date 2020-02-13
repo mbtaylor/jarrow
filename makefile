@@ -66,7 +66,7 @@ fbs/$(NAMESPACE): $(NAMESPACE)_metadata.fbs
 $(JARFILE): $(JSRC) $(FBSRC) $(STIL_JAR)
 	rm -rf tmp
 	mkdir -p tmp
-	javac -d tmp $(JSRC) $(FBSRC) \
+	javac -Xlint:all,-serial,-path -d tmp $(JSRC) $(FBSRC) \
             && jar cf $@ -C tmp .
 	rm -rf tmp
 

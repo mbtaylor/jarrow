@@ -37,7 +37,8 @@ public class FeatherTable {
             byte type = parr.type();
             long nNull = parr.nullCount();
             String userMeta = col.userMetadata();
-            Decoder decoder = Decoder.createDecoder( parr.type(), nNull > 0 );
+            Decoder<?> decoder =
+                Decoder.createDecoder( parr.type(), nNull > 0 );
             BufMapper mapper =
                 new BufMapper( channel, parr.offset(), parr.totalBytes() );
             columns_[ ic ] =
@@ -124,5 +125,21 @@ public class FeatherTable {
     public static void main( String[] args ) throws IOException {
         FeatherTable ft = FeatherTable.fromFile( new File( args[ 0 ] ) );
         System.out.println( ft );
+        int ncol = ft.getColumnCount();
+        Reader<?>[] rdrs = new Reader<?>[ ncol ];
+        System.out.print( "#" );
+        for ( int ic = 0; ic < ncol; ic++ ) {
+            FeatherColumn fcol = ft.getColumn( ic );
+            rdrs[ ic ] = fcol.createReader();
+            System.out.print( "\t" + fcol.getName() );
+        }
+        System.out.println();
+        long nrow = ft.getRowCount();
+        for ( long ir = 0; ir < nrow; ir++ ) {
+            for ( int ic = 0; ic < ncol; ic++ ) {
+                System.out.print( "\t" + rdrs[ ic ].getObject( ir ) );
+            }
+            System.out.println();
+        }
     }
 }
