@@ -9,16 +9,38 @@ FLATC = /mbt/github/flatbuffers/flatc
 JARFILE = jarrow.jar
 
 JSRC = \
-       Dump.java \
-       Feather.java \
-       FeatherMeta.java \
+       BufMapper.java \
+       Decoder.java \
+       FeatherColumn.java \
+       FeatherTable.java \
+       Reader.java \
 
-FBSRC = `find fbs -name "*.java" -print`
+FBSRC = \
+       fbs/com/google/flatbuffers/ByteBufferUtil.java \
+       fbs/com/google/flatbuffers/Constants.java \
+       fbs/com/google/flatbuffers/FlatBufferBuilder.java \
+       fbs/com/google/flatbuffers/Struct.java \
+       fbs/com/google/flatbuffers/Table.java \
+       fbs/com/google/flatbuffers/Utf8.java \
+       fbs/com/google/flatbuffers/Utf8Old.java \
+       fbs/com/google/flatbuffers/Utf8Safe.java \
+       fbs/jarrow/fbs/CategoryMetadata.java \
+       fbs/jarrow/fbs/Column.java \
+       fbs/jarrow/fbs/CTable.java \
+       fbs/jarrow/fbs/DateMetadata.java \
+       fbs/jarrow/fbs/Encoding.java \
+       fbs/jarrow/fbs/PrimitiveArray.java \
+       fbs/jarrow/fbs/TimeMetadata.java \
+       fbs/jarrow/fbs/TimestampMetadata.java \
+       fbs/jarrow/fbs/TimeUnit.java \
+       fbs/jarrow/fbs/Type.java \
+       fbs/jarrow/fbs/TypeMetadata.java \
+
 
 build: $(JARFILE) javadocs data.fea
 
 run: $(JARFILE) data.fea
-	java -classpath $(JARFILE) Dump data.fea
+	java -classpath $(JARFILE) jarrow.feather.FeatherTable data.fea
 
 jar: $(JARFILE)
 
@@ -41,7 +63,7 @@ fbs/$(NAMESPACE): $(NAMESPACE)_metadata.fbs
 	cd fbs; \
         $(FLATC) --java ../$(NAMESPACE)_metadata.fbs
 
-$(JARFILE): $(JSRC) $(STIL_JAR)
+$(JARFILE): $(JSRC) $(FBSRC) $(STIL_JAR)
 	rm -rf tmp
 	mkdir -p tmp
 	javac -d tmp $(JSRC) $(FBSRC) \
