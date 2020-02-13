@@ -3,7 +3,8 @@ import pyarrow.feather as feather
 
 d = {
    "ic": [1,2,3,4],
-   "dc": [10.,11.,12.,13.]
+   "dc": [10.,11.,12.,13.],
+   "bc": [True, False, False, True],
 }
 cols = ["icol", "dcol"];
 

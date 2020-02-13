@@ -46,6 +46,37 @@ public abstract class Decoder<T> {
 
     private static Decoder<?>[] createTypeDecoders() {
         Decoder<?>[] decoders = new Decoder<?>[ 20 ];
+        decoders[ Type.BOOL ] = new Decoder<Boolean>( Boolean.class ) {
+            public Reader<Boolean> createReader( final ByteBuffer bbuf ) {
+                return new AbstractReader<Boolean>( Boolean.class ) {
+                    private boolean get( long ix ) {
+                        return ( bbuf.get( longToInt( ix / 8 ) )
+                               & ( 1 << ((int) ix) % 8 ) ) != 0;
+                    }
+                    public Boolean getObject( long ix ) {
+                        return Boolean.valueOf( get( ix ) );
+                    }
+                    public byte getByte( long ix ) {
+                        return get( ix ) ? (byte) 1 : (byte) 0;
+                    }
+                    public short getShort( long ix ) {
+                        return get( ix ) ? (short) 1 : (short) 0;
+                    }
+                    public int getInt( long ix ) {
+                        return get( ix ) ? 1 : 0;
+                    }
+                    public long getLong( long ix ) {
+                        return get( ix ) ? 1L : 0L;
+                    }
+                    public float getFloat( long ix ) {
+                        return get( ix ) ? 1f : 0f;
+                    }
+                    public double getDouble( long ix ) {
+                        return get( ix ) ? 1. : 0.;
+                    }
+                };
+            };
+        };
         decoders[ Type.INT8 ] = new Decoder<Byte>( Byte.class ) {
             public Reader<Byte> createReader( final ByteBuffer bbuf ) {
                 return new AbstractReader<Byte>( Byte.class ) {
