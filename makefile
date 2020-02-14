@@ -10,9 +10,12 @@ JARFILE = jarrow.jar
 
 JSRC = \
        BufMapper.java \
+       ColStat.java \
        Decoder.java \
        FeatherColumn.java \
+       FeatherColumnWriter.java \
        FeatherTable.java \
+       FeatherTableWriter.java \
        Reader.java \
 
 FBSRC = \
@@ -39,8 +42,16 @@ FBSRC = \
 
 build: $(JARFILE) javadocs data.fea
 
-run: $(JARFILE) data.fea
-	java -classpath $(JARFILE) jarrow.feather.FeatherTable data.fea
+read: $(JARFILE) data.fea
+	java -ea -classpath $(JARFILE) jarrow.feather.FeatherTable data.fea
+
+write: test.fea
+
+rw: test.fea
+	java -ea -classpath $(JARFILE) jarrow.feather.FeatherTable test.fea
+
+test.fea: $(JARFILE)
+	java -ea -classpath $(JARFILE) jarrow.feather.FeatherTableWriter >$@
 
 jar: $(JARFILE)
 
@@ -71,7 +82,7 @@ $(JARFILE): $(JSRC) $(FBSRC) $(STIL_JAR)
 	rm -rf tmp
 
 clean:
-	rm -f $(JARFILE) $(NAMESPACE)_metadata.fbs
+	rm -f $(JARFILE) $(NAMESPACE)_metadata.fbs test.fea
 	rm -rf tmp javadocs
 
 veryclean: clean
