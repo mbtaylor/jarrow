@@ -9,6 +9,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 @SuppressWarnings("cast")
@@ -37,7 +38,6 @@ public abstract class Decoder<T> {
     }
 
     private static final Decoder<?>[] TYPE_DECODERS = createTypeDecoders();
-    private static final Decoder<?> UNSUPPORTED = new UnsupportedDecoder();
 
     public static Decoder<?> createDecoder( byte type ) {
         Decoder<?> decoder = type >= 0 && type <= TYPE_DECODERS.length
@@ -48,7 +48,7 @@ public abstract class Decoder<T> {
         }
         else {
             logger_.warning( "No decoder for data type " + type );
-            return UNSUPPORTED;
+            return new UnsupportedDecoder( "???" + type + "???" );
         }
     }
 
@@ -68,7 +68,7 @@ public abstract class Decoder<T> {
     }
 
     private static Decoder<?>[] createTypeDecoders() {
-        Decoder<?>[] decoders = new Decoder<?>[ 20 ];
+        Decoder<?>[] decoders = new Decoder<?>[ 17 ];
         decoders[ Type.BOOL ] = new Decoder<Boolean>( Boolean.class, "BOOL" ) {
             public Reader<Boolean> createReader( final ByteBuffer bbuf,
                                                  long nrow ) {
@@ -193,7 +193,7 @@ public abstract class Decoder<T> {
                 };
             }
         };
-        decoders[ Type.UINT64 ] = UNSUPPORTED;
+        decoders[ Type.UINT64 ] = new UnsupportedDecoder( "UINT64" );
         decoders[ Type.FLOAT ] = new Decoder<Float>( Float.class, "FLOAT" ) {
             public Reader<Float> createReader( ByteBuffer bbuf, long nrow ) {
                 final FloatBuffer fbuf = bbuf.asFloatBuffer();
@@ -281,6 +281,42 @@ public abstract class Decoder<T> {
                 };
             }
         };
+        /* I could do this, but (1) I don't know if there are any instances
+         * of this data type in feather files out there and (2) it's not
+         * clear to me how to interpret the feather format documentation. */
+        decoders[ Type.CATEGORY ] = new UnsupportedDecoder( "CATEGORY" );
+        decoders[ Type.TIMESTAMP ] =
+                new Decoder<Long>( Long.class, "TIMESTAMP" ) {
+            public Reader<Long> createReader( ByteBuffer bbuf, long nrow ) {
+                final LongBuffer lbuf = bbuf.asLongBuffer();
+                return new LongReader() {
+                    long get( long ix ) {
+                        return lbuf.get( longToInt( ix ) );
+                    }
+                };
+            }
+        };
+        decoders[ Type.DATE ] = new Decoder<Integer>( Integer.class, "DATE" ) {
+            public Reader<Integer> createReader( ByteBuffer bbuf, long nrow ) {
+                final IntBuffer ibuf = bbuf.asIntBuffer();
+                return new IntReader() {
+                    int get( long ix ) {
+                        return ibuf.get( longToInt( ix ) );
+                    }
+                };
+            }
+        };
+        decoders[ Type.TIME ] = new Decoder<Long>( Long.class, "TIME" ) {
+            public Reader<Long> createReader( ByteBuffer bbuf, long nrow ) {
+                final LongBuffer lbuf = bbuf.asLongBuffer();
+                return new LongReader() {
+                    long get( long ix ) {
+                        return lbuf.get( longToInt( ix ) );
+                    }
+                };
+            }
+        };
+        assert Arrays.asList( decoders ).indexOf( null ) == -1;
         return decoders;
     }
 
@@ -427,8 +463,8 @@ public abstract class Decoder<T> {
 
     private static class UnsupportedDecoder extends Decoder<Void> {
         private static Reader<Void> dummyReader_;
-        UnsupportedDecoder() {
-            super( Void.class, "UNSUPPORTED" );
+        UnsupportedDecoder( String name ) {
+            super( Void.class, name + "(*unsupported*)" );
             dummyReader_ = new NonNumericReader<Void>( Void.class ) {
                 public Void getObject( long ix ) {
                     return null;
