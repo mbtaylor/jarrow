@@ -3,6 +3,7 @@ package jarrow.feather;
 import jarrow.fbs.Type;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 public abstract class DefaultColumnWriter implements FeatherColumnWriter {
 
@@ -160,6 +161,29 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
         };
     }
 
+    public static FeatherColumnWriter
+            createStringWriter( String name, final String[] data,
+                                String userMeta, boolean isNullable ) {
+        final Charset UTF8 = Charset.forName( "UTF-8" );
+        return new VariableLengthWriter( name, Type.UTF8, data.length,
+                                         isNullable, userMeta ) {
+            public boolean isNull( long irow ) {
+                return data[ Decoder.longToInt( irow ) ] == null;
+            }
+            public int getByteSize( long irow ) {
+                String str = data[ Decoder.longToInt( irow ) ];
+                return str == null ? 0 : str.getBytes( UTF8 ).length;
+            }
+            public void writeItem( long irow, OutputStream out )
+                    throws IOException {
+                String str = data[ Decoder.longToInt( irow ) ];
+                if ( str != null ) {
+                    out.write( str.getBytes( UTF8 ) );
+                }
+            }
+        };
+    }
+
     public static void writeLittleEndianLong( OutputStream out, long l )
             throws IOException {
         out.write( ( (int) ( l >>  0 ) ) & 0xff );
@@ -230,6 +254,37 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
         }
         protected abstract void writeData( OutputStream out )
                 throws IOException;
+    }
+
+    private static abstract class VariableLengthWriter
+            extends DefaultColumnWriter {
+        private final long nrow_;
+        VariableLengthWriter( String name, byte type, long nrow,
+                              boolean isNullable, String userMeta ) {
+            super( name, type, nrow, isNullable, userMeta );
+            nrow_ = nrow;
+        }
+
+        abstract int getByteSize( long irow );
+        abstract void writeItem( long irow, OutputStream out )
+                throws IOException;
+
+        public long writeDataBytes( OutputStream out ) throws IOException {
+            int ioff = 0;
+            for ( int ir = 0; ir < nrow_; ir++ ) {
+                writeLittleEndianInt( out, ioff );
+                ioff += getByteSize( ir );
+            }
+            writeLittleEndianInt( out, ioff );
+            long nbyteIndex = 4 * ( nrow_ + 1 );
+            nbyteIndex += align8( out, nbyteIndex );
+            long nbyteData = ioff;
+            for ( int ir = 0; ir < nrow_; ir++ ) {
+                writeItem( ir, out );
+            }
+            nbyteData += align8( out, nbyteData );
+            return nbyteIndex + nbyteData;
+        }
     }
 
     private static class NoNullColStat implements ColStat {

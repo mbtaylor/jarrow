@@ -113,12 +113,15 @@ public class FeatherTableWriter {
         long[] ldata = new long[ nrow ];
         float[] fdata = new float[ nrow ];
         double[] ddata = new double[ nrow ];
+        String[] tdata = new String[ nrow ];
+        String[] txts = { "zero", "one", null, "three", "", };
         for ( int ir = 0; ir < nrow; ir++ ) {
             sdata[ ir ] = (short) ir;
             idata[ ir ] = -ir;
             ldata[ ir ] = 4_000_000_000L + ir;
             fdata[ ir ] = ir == 2 ? Float.NaN : 0.25f + ir;
             ddata[ ir ] = ir == 2 ? Double.NaN : 0.5 + ir;
+            tdata[ ir ] = txts[ ir % txts.length ];
         }
         FeatherColumnWriter[] writers = {
             DefaultColumnWriter.createShortWriter( "scol", sdata, null ),
@@ -126,6 +129,7 @@ public class FeatherTableWriter {
             DefaultColumnWriter.createLongWriter( "lcol", ldata, null ),
             DefaultColumnWriter.createFloatWriter( "fcol", fdata, null ),
             DefaultColumnWriter.createDoubleWriter( "dcol", ddata, null ),
+            DefaultColumnWriter.createStringWriter( "tcol", tdata, null, false )
         };
         new FeatherTableWriter( nrow, "test table", null, writers )
            .write( System.out );
