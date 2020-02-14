@@ -44,7 +44,7 @@ public class FeatherColumn {
         if ( nNull_ == 0 ) {
             ByteBuffer bbuf =
                 mapper_.mapBuffer().order( ByteOrder.LITTLE_ENDIAN );
-            return decoder_.createReader( bbuf );
+            return decoder_.createReader( bbuf, nrow_ );
         }
         else {
             ByteBuffer maskBuf =
@@ -56,7 +56,7 @@ public class FeatherColumn {
             // it's aligned on 64-bit boundaries.
             int dataOffset = Decoder.longToInt( ( ( nrow_ + 63 ) / 64 ) * 8 );
             dataBuf.position( dataOffset );
-            return createMaskReader( decoder_.createReader( dataBuf ),
+            return createMaskReader( decoder_.createReader( dataBuf, nrow_ ),
                                      maskBuf );
         }
     }
