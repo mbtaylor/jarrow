@@ -102,7 +102,7 @@ public class FeatherTableWriter {
 
     private static int writeLittleEndianInt( OutputStream out, int ivalue )
             throws IOException {
-        FeatherColumnWriter.writeLittleEndianInt( out, ivalue );
+        DefaultColumnWriter.writeLittleEndianInt( out, ivalue );
         return 4;
     }
 
@@ -121,11 +121,11 @@ public class FeatherTableWriter {
             ddata[ ir ] = ir == 2 ? Double.NaN : 0.5 + ir;
         }
         FeatherColumnWriter[] writers = {
-            FeatherColumnWriter.createShortWriter( "scol", sdata, null ),
-            FeatherColumnWriter.createIntWriter( "icol", idata, null ),
-            FeatherColumnWriter.createLongWriter( "lcol", ldata, null ),
-            FeatherColumnWriter.createFloatWriter( "fcol", fdata, null ),
-            FeatherColumnWriter.createDoubleWriter( "dcol", ddata, null ),
+            DefaultColumnWriter.createShortWriter( "scol", sdata, null ),
+            DefaultColumnWriter.createIntWriter( "icol", idata, null ),
+            DefaultColumnWriter.createLongWriter( "lcol", ldata, null ),
+            DefaultColumnWriter.createFloatWriter( "fcol", fdata, null ),
+            DefaultColumnWriter.createDoubleWriter( "dcol", ddata, null ),
         };
         new FeatherTableWriter( nrow, "test table", null, writers )
            .write( System.out );

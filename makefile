@@ -12,6 +12,7 @@ JSRC = \
        BufMapper.java \
        ColStat.java \
        Decoder.java \
+       DefaultColumnWriter.java \
        FeatherColumn.java \
        FeatherColumnWriter.java \
        FeatherTable.java \
