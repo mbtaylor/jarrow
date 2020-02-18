@@ -125,7 +125,7 @@ public class FeatherTableWriter {
         }
         FeatherColumnWriter[] writers = {
             DefaultColumnWriter.createShortWriter( "scol", sdata, null ),
-            DefaultColumnWriter.createIntWriter( "icol", idata, null ),
+            DefaultColumnWriter.createIntWriter( "icol", idata, "int col" ),
             DefaultColumnWriter.createLongWriter( "lcol", ldata, null ),
             DefaultColumnWriter.createFloatWriter( "fcol", fdata, null ),
             DefaultColumnWriter.createDoubleWriter( "dcol", ddata, null ),

@@ -56,6 +56,9 @@ public class FeatherColumn {
             // it's aligned on 64-bit boundaries.
             int dataOffset = Decoder.longToInt( ( ( nrow_ + 63 ) / 64 ) * 8 );
             dataBuf.position( dataOffset );
+            ByteOrder order = dataBuf.order();
+            dataBuf = dataBuf.slice();
+            dataBuf.order( order );
             return createMaskReader( decoder_.createReader( dataBuf, nrow_ ),
                                      maskBuf );
         }
@@ -70,6 +73,12 @@ public class FeatherColumn {
         if ( nNull_ > 0 ) {
             sbuf.append( ",nulls=" )
                 .append( nNull_ );
+        }
+        if ( userMeta_ != null && userMeta_.trim().length() > 0 ) {
+            sbuf.append( ":" )
+                .append( '"' )
+                .append( userMeta_ )
+                .append( '"' );
         }
         sbuf.append( ")" );
         return sbuf.toString();
