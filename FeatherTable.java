@@ -114,6 +114,17 @@ public class FeatherTable {
         return new FeatherTable( ctable, raf.getChannel(), file.toString() );
     }
 
+    public static boolean isMagic( byte[] intro ) {
+        if ( intro.length < 4 ) {
+            return false;
+        }
+        return intro.length >= 4
+            && MAGIC == ( ( intro[ 0 ] & 0xff ) <<  0
+                        | ( intro[ 1 ] & 0xff ) <<  8
+                        | ( intro[ 2 ] & 0xff ) << 16
+                        | ( intro[ 3 ] & 0xff ) << 24 );
+    }
+
     public static void main( String[] args ) throws IOException {
         FeatherTable ft = FeatherTable.fromFile( new File( args[ 0 ] ) );
         System.out.println( ft );

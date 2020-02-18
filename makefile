@@ -4,6 +4,9 @@ PYTHON = $(PYTHON_DIR)/python3
 NAMESPACE = jarrow
 JAVADOC_FLAGS = -Xdoclint:none
 
+STIL_JAR = stil.jar
+JSON_JAR = json.jar
+
 FLATC = /mbt/github/flatbuffers/flatc
 
 JARFILE = jarrow.jar
@@ -21,6 +24,10 @@ JSRC = \
        PrimitiveArrayWriter.java \
        Reader.java \
        VariableLengthWriter.java \
+
+STIL_JSRC = \
+       FeatherStarTable.java \
+       FeatherTableBuilder.java \
 
 FBSRC = \
        fbs/com/google/flatbuffers/ByteBufferUtil.java \
@@ -43,7 +50,6 @@ FBSRC = \
        fbs/jarrow/fbs/Type.java \
        fbs/jarrow/fbs/TypeMetadata.java \
 
-
 build: $(JARFILE) javadocs data.fea
 
 read: $(JARFILE) data.fea
@@ -59,14 +65,22 @@ test.fea: $(JARFILE)
 
 jar: $(JARFILE)
 
-javadocs: $(JSRC)
+javadocs: $(JSRC) $(STIL_JSRC)
 	rm -rf javadocs
 	mkdir javadocs
 	javadoc $(JAVADOC_FLAGS) -quiet \
-                -d javadocs $(JSRC) $(FBSRC)
+                -classpath $(STIL_JAR):$(JSON_JAR) \
+                -d javadocs \
+                $(JSRC) $(STIL_JSRC) $(FBSRC)
 
 data.fea: data.py
 	$(PYTHON) data.py
+
+$(STIL_JAR):
+	curl -OL http://www.starlink.ac.uk/stil/stil.jar
+
+$(JSON_JAR):
+	cp /mbt/starjava/lib/ttools/json.jar .
 
 $(NAMESPACE)_metadata.fbs: feather_metadata.fbs
 	sed -e 's/^namespace.*/namespace $(NAMESPACE).fbs;/' \
@@ -78,10 +92,12 @@ fbs/$(NAMESPACE): $(NAMESPACE)_metadata.fbs
 	cd fbs; \
         $(FLATC) --java ../$(NAMESPACE)_metadata.fbs
 
-$(JARFILE): $(JSRC) $(FBSRC) $(STIL_JAR)
+$(JARFILE): $(JSRC) $(STIL_JSRC) $(FBSRC) $(STIL_JAR) $(JSON_JAR)
 	rm -rf tmp
 	mkdir -p tmp
-	javac -Xlint:all,-serial,-path -d tmp $(JSRC) $(FBSRC) \
+	javac -Xlint:all,-serial,-path -d tmp \
+              -classpath $(STIL_JAR):$(JSON_JAR) \
+              $(JSRC) $(STIL_JSRC) $(FBSRC) \
             && jar cf $@ -C tmp .
 	rm -rf tmp
 

@@ -28,6 +28,10 @@ public class FeatherColumn {
         return name_;
     }
 
+    public Class<?> getValueClass() {
+        return decoder_.getValueClass();
+    }
+
     public long getRowCount() {
         return nrow_;
     }
