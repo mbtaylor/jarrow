@@ -17,6 +17,11 @@ public class BufMapper {
     }
 
     public ByteBuffer mapBuffer() throws IOException {
-        return channel_.map( FileChannel.MapMode.READ_ONLY, start_, length_ );
+        return mapBuffer( 0 );
+    }
+
+    public ByteBuffer mapBuffer( long offset ) throws IOException {
+        return channel_.map( FileChannel.MapMode.READ_ONLY,
+                             start_ + offset, length_ - offset );
     }
 }

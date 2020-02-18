@@ -47,18 +47,14 @@ public class FeatherColumn {
             return decoder_.createReader( bbuf, nrow_ );
         }
         else {
+            // The Feather docs say this is byte aligned, but it looks like
+            // it's aligned on 64-bit boundaries.
+            int dataOffset = BufUtils.longToInt( ( ( nrow_ + 63 ) / 64 ) * 8 );
             ByteBuffer maskBuf =
                 mapper_.mapBuffer().order( ByteOrder.LITTLE_ENDIAN );
             ByteBuffer dataBuf =
-                mapper_.mapBuffer().order( ByteOrder.LITTLE_ENDIAN );
-
-            // The Feather docs say this is byte aligned, but it looks like
-            // it's aligned on 64-bit boundaries.
-            int dataOffset = Decoder.longToInt( ( ( nrow_ + 63 ) / 64 ) * 8 );
-            dataBuf.position( dataOffset );
-            ByteOrder order = dataBuf.order();
-            dataBuf = dataBuf.slice();
-            dataBuf.order( order );
+                mapper_.mapBuffer( dataOffset )
+                       .order( ByteOrder.LITTLE_ENDIAN );
             return createMaskReader( decoder_.createReader( dataBuf, nrow_ ),
                                      maskBuf );
         }
