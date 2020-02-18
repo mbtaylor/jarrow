@@ -8,7 +8,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -245,13 +244,12 @@ public abstract class Decoder<T> {
             }
         };
         decoders[ Type.UTF8 ] = new Decoder<String>( String.class, "UTF8" ) {
-            final Charset utf8 = Charset.forName( "UTF-8" );
             public Reader<String> createReader( final ByteBuffer bbuf,
                                                 long nrow ) {
                 return new VariableLengthReader<String>( String.class,
                                                          bbuf, nrow ) {
                     public String getObject( long ix ) {
-                        return new String( getBytes( ix ), utf8 );
+                        return new String( getBytes( ix ), BufUtils.UTF8 );
                     }
                 };
             }

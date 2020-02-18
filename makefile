@@ -9,16 +9,18 @@ FLATC = /mbt/github/flatbuffers/flatc
 JARFILE = jarrow.jar
 
 JSRC = \
+       AbstractColumnWriter.java \
        BufMapper.java \
        BufUtils.java \
        ColStat.java \
        Decoder.java \
-       DefaultColumnWriter.java \
        FeatherColumn.java \
        FeatherColumnWriter.java \
        FeatherTable.java \
        FeatherTableWriter.java \
+       PrimitiveArrayWriter.java \
        Reader.java \
+       VariableLengthWriter.java \
 
 FBSRC = \
        fbs/com/google/flatbuffers/ByteBufferUtil.java \

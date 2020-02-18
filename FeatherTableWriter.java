@@ -124,12 +124,12 @@ public class FeatherTableWriter {
             tdata[ ir ] = txts[ ir % txts.length ];
         }
         FeatherColumnWriter[] writers = {
-            DefaultColumnWriter.createShortWriter( "scol", sdata, null ),
-            DefaultColumnWriter.createIntWriter( "icol", idata, "int col" ),
-            DefaultColumnWriter.createLongWriter( "lcol", ldata, null ),
-            DefaultColumnWriter.createFloatWriter( "fcol", fdata, null ),
-            DefaultColumnWriter.createDoubleWriter( "dcol", ddata, null ),
-            DefaultColumnWriter.createStringWriter( "tcol", tdata, null, false )
+            PrimitiveArrayWriter.createShortWriter( "scol", sdata, null ),
+            PrimitiveArrayWriter.createIntWriter( "icol", idata, "int col" ),
+            PrimitiveArrayWriter.createLongWriter( "lcol", ldata, null ),
+            PrimitiveArrayWriter.createFloatWriter( "fcol", fdata, null ),
+            PrimitiveArrayWriter.createDoubleWriter( "dcol", ddata, null ),
+            VariableLengthWriter.createStringWriter( "tcol", tdata, null, false)
         };
         new FeatherTableWriter( nrow, "test table", null, writers )
            .write( System.out );
