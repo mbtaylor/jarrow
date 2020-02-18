@@ -6,6 +6,7 @@ JAVADOC_FLAGS = -Xdoclint:none
 
 STIL_JAR = stil.jar
 JSON_JAR = json.jar
+STILTS = stilts -classpath $(JARFILE):$(JSON_JAR)
 
 FLATC = /mbt/github/flatbuffers/flatc
 
@@ -26,8 +27,12 @@ JSRC = \
        VariableLengthWriter.java \
 
 STIL_JSRC = \
+       FeatherEncoder.java \
+       FeatherEncoders.java \
        FeatherStarTable.java \
+       FeatherStarTableWriter.java \
        FeatherTableBuilder.java \
+       StarFeatherColumnWriter.java \
 
 FBSRC = \
        fbs/com/google/flatbuffers/ByteBufferUtil.java \
@@ -59,6 +64,17 @@ write: test.fea
 
 rw: test.fea
 	java -ea -classpath $(JARFILE) jarrow.feather.FeatherTable test.fea
+
+rws: data.fea $(JARFILE) $(JSON_JAR)
+	$(STILTS) tpipe \
+               in=data.fea ifmt=uk.ac.starlink.feather.FeatherTableBuilder \
+               out=x.vot && \
+	$(STILTS) tpipe in=x.vot && \
+        $(STILTS) tpipe \
+               in=x.vot \
+               ofmt=uk.ac.starlink.feather.FeatherStarTableWriter out=x.fea && \
+        $(STILTS) tpipe \
+               in=x.fea ifmt=uk.ac.starlink.feather.FeatherTableBuilder \
 
 test.fea: $(JARFILE)
 	java -ea -classpath $(JARFILE) jarrow.feather.FeatherTableWriter >$@
@@ -102,7 +118,8 @@ $(JARFILE): $(JSRC) $(STIL_JSRC) $(FBSRC) $(STIL_JAR) $(JSON_JAR)
 	rm -rf tmp
 
 clean:
-	rm -f $(JARFILE) $(NAMESPACE)_metadata.fbs test.fea
+	rm -f $(JARFILE) $(NAMESPACE)_metadata.fbs $(JSON_JAR) $(STIL_JAR) \
+              test.fea x.fea x.vot
 	rm -rf tmp javadocs
 
 veryclean: clean
