@@ -87,4 +87,28 @@ public class BufUtils {
         }
         return pad;
     }
+
+    public static int utf8Length( CharSequence cseq ) {
+
+        // copied from https://stackoverflow.com/questions/8511490
+        int count = 0;
+        int nc = cseq.length();
+        for ( int i = 0; i < nc; i++ ) {
+            char ch = cseq.charAt( i );
+            if ( ch <= 0x7F ) {
+                count++;
+            }
+            else if ( ch <= 0x7FF ) {
+                count += 2;
+            }
+            else if ( Character.isHighSurrogate( ch ) ) {
+                count += 4;
+                ++i;
+            }
+            else {
+                count += 3;
+            }
+        }
+        return count;
+    }
 }

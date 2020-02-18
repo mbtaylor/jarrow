@@ -43,7 +43,7 @@ public abstract class VariableLengthWriter extends AbstractColumnWriter {
             }
             public int getByteSize( long irow ) {
                 String str = data[ BufUtils.longToInt( irow ) ];
-                return str == null ? 0 : str.getBytes( BufUtils.UTF8 ).length;
+                return str == null ? 0 : BufUtils.utf8Length( str );
             }
             public void writeItem( long irow, OutputStream out )
                     throws IOException {
