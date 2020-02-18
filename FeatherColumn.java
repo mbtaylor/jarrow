@@ -84,7 +84,7 @@ public class FeatherColumn {
                                                    final ByteBuffer maskBuf ) {
         return new Reader<T>() {
             private boolean isNull( long ix ) {
-                return Decoder.isBitSet( maskBuf, ix );
+                return BufUtils.isBitSet( maskBuf, ix );
             }
             public T getObject( long ix ) {
                 return isNull( ix ) ? basicReader.getObject( ix ) : null;

@@ -93,23 +93,16 @@ public class FeatherTable {
         return sbuf.toString();
     }
 
-    static int readLittleEndianInt( RandomAccessFile raf ) throws IOException {
-        return ( raf.read() & 0xff ) <<  0
-             | ( raf.read() & 0xff ) <<  8
-             | ( raf.read() & 0xff ) << 16
-             | ( raf.read() & 0xff ) << 24;
-    }
-
     public static FeatherTable fromFile( File file ) throws IOException {
         RandomAccessFile raf = new RandomAccessFile( file, "r" );
         long leng = raf.length();
-        int magic1 = readLittleEndianInt( raf );
+        int magic1 = BufUtils.readLittleEndianInt( raf );
         if ( magic1 != MAGIC ) {
             throw new IOException( "Not FEA1 magic number at file start" );
         }
         raf.seek( leng - 8 );
-        int metaLeng = readLittleEndianInt( raf );
-        int magic2 = readLittleEndianInt( raf );
+        int metaLeng = BufUtils.readLittleEndianInt( raf );
+        int magic2 = BufUtils.readLittleEndianInt( raf );
         if ( magic2 != MAGIC ) {
             throw new IOException( "Not FEA1 magic number at file start" );
         }

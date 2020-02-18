@@ -55,13 +55,13 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
                 out.write( mask );
             }
             long mb = ( nrow_ + 7 ) / 8;
-            maskBytes = mb + align8( out, mb );
+            maskBytes = mb + BufUtils.align8( out, mb );
         }
         else {
             maskBytes = 0;
         }
         long dataBytes = writeDataBytes( out );
-        dataBytes += align8( out, dataBytes );
+        dataBytes += BufUtils.align8( out, dataBytes );
         boolean hasNull = nNull > 0;
         final long byteCount = hasNull ? maskBytes + dataBytes : dataBytes;
         final long dataOffset = hasNull ? 0 : maskBytes;
@@ -93,7 +93,7 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
                                          data.length ) {
             protected void writeData( OutputStream out ) throws IOException {
                 for ( int i = 0; i < nrow_; i++ ) {
-                    writeLittleEndianDouble( out, data[ i ] );
+                    BufUtils.writeLittleEndianDouble( out, data[ i ] );
                 }
             }
         };
@@ -106,7 +106,7 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
                                          data.length ) {
             protected void writeData( OutputStream out ) throws IOException {
                 for ( int i = 0; i < nrow_; i++ ) {
-                    writeLittleEndianFloat( out, data[ i ] );
+                    BufUtils.writeLittleEndianFloat( out, data[ i ] );
                 }
             }
         };
@@ -119,7 +119,7 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
                                          data.length ) {
             protected void writeData( OutputStream out ) throws IOException {
                 for ( int i = 0; i < nrow_; i++ ) {
-                    writeLittleEndianLong( out, data[ i ] );
+                    BufUtils.writeLittleEndianLong( out, data[ i ] );
                 }
             }
         };
@@ -131,7 +131,7 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
                                          data.length ) {
             protected void writeData( OutputStream out ) throws IOException {
                 for ( int i = 0; i < nrow_; i++ ) {
-                    writeLittleEndianInt( out, data[ i ] );
+                    BufUtils.writeLittleEndianInt( out, data[ i ] );
                 }
             }
         };
@@ -144,7 +144,7 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
                                          data.length ) {
             protected void writeData( OutputStream out ) throws IOException {
                 for ( int i = 0; i < nrow_; i++ ) {
-                    writeLittleEndianShort( out, data[ i ] );
+                    BufUtils.writeLittleEndianShort( out, data[ i ] );
                 }
             }
         };
@@ -168,71 +168,20 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
         return new VariableLengthWriter( name, Type.UTF8, data.length,
                                          isNullable, userMeta ) {
             public boolean isNull( long irow ) {
-                return data[ Decoder.longToInt( irow ) ] == null;
+                return data[ BufUtils.longToInt( irow ) ] == null;
             }
             public int getByteSize( long irow ) {
-                String str = data[ Decoder.longToInt( irow ) ];
+                String str = data[ BufUtils.longToInt( irow ) ];
                 return str == null ? 0 : str.getBytes( UTF8 ).length;
             }
             public void writeItem( long irow, OutputStream out )
                     throws IOException {
-                String str = data[ Decoder.longToInt( irow ) ];
+                String str = data[ BufUtils.longToInt( irow ) ];
                 if ( str != null ) {
                     out.write( str.getBytes( UTF8 ) );
                 }
             }
         };
-    }
-
-    public static void writeLittleEndianLong( OutputStream out, long l )
-            throws IOException {
-        out.write( ( (int) ( l >>  0 ) ) & 0xff );
-        out.write( ( (int) ( l >>  8 ) ) & 0xff );
-        out.write( ( (int) ( l >> 16 ) ) & 0xff );
-        out.write( ( (int) ( l >> 24 ) ) & 0xff );
-        out.write( ( (int) ( l >> 32 ) ) & 0xff );
-        out.write( ( (int) ( l >> 40 ) ) & 0xff );
-        out.write( ( (int) ( l >> 48 ) ) & 0xff );
-        out.write( ( (int) ( l >> 56 ) ) & 0xff );
-    }
-
-    public static void writeLittleEndianInt( OutputStream out, int i )
-            throws IOException {
-        out.write( ( i >>  0 ) & 0xff );
-        out.write( ( i >>  8 ) & 0xff );
-        out.write( ( i >> 16 ) & 0xff );
-        out.write( ( i >> 24 ) & 0xff );
-    }
-
-    public static void writeLittleEndianShort( OutputStream out, short s )
-            throws IOException {
-        out.write( ( s >> 0 ) & 0xff );
-        out.write( ( s >> 8 ) & 0xff );
-    }
-
-    public static void writeLittleEndianDouble( OutputStream out, double d )
-            throws IOException {
-        writeLittleEndianLong( out, Double.doubleToLongBits( d ) );
-    }
-
-    public static void writeLittleEndianFloat( OutputStream out, float f )
-            throws IOException {
-        writeLittleEndianInt( out, Float.floatToIntBits( f ) );
-    }
-
-    private static int align8( OutputStream out, long nb ) throws IOException {
-        int over = (int) ( nb % 8 );
-        int pad;
-        if ( over > 0 ) {
-            pad = 8 - over;
-            for ( int i = 0; i < pad; i++ ) {
-                out.write( 0 );
-            }
-        }
-        else {
-            pad = 0;
-        }
-        return pad;
     }
 
     public static abstract class PrimitiveArrayWriter
@@ -272,17 +221,17 @@ public abstract class DefaultColumnWriter implements FeatherColumnWriter {
         public long writeDataBytes( OutputStream out ) throws IOException {
             int ioff = 0;
             for ( int ir = 0; ir < nrow_; ir++ ) {
-                writeLittleEndianInt( out, ioff );
+                BufUtils.writeLittleEndianInt( out, ioff );
                 ioff += getByteSize( ir );
             }
-            writeLittleEndianInt( out, ioff );
+            BufUtils.writeLittleEndianInt( out, ioff );
             long nbyteIndex = 4 * ( nrow_ + 1 );
-            nbyteIndex += align8( out, nbyteIndex );
+            nbyteIndex += BufUtils.align8( out, nbyteIndex );
             long nbyteData = ioff;
             for ( int ir = 0; ir < nrow_; ir++ ) {
                 writeItem( ir, out );
             }
-            nbyteData += align8( out, nbyteData );
+            nbyteData += BufUtils.align8( out, nbyteData );
             return nbyteIndex + nbyteData;
         }
     }

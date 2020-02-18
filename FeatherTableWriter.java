@@ -102,7 +102,7 @@ public class FeatherTableWriter {
 
     private static int writeLittleEndianInt( OutputStream out, int ivalue )
             throws IOException {
-        DefaultColumnWriter.writeLittleEndianInt( out, ivalue );
+        BufUtils.writeLittleEndianInt( out, ivalue );
         return 4;
     }
 
@@ -134,5 +134,4 @@ public class FeatherTableWriter {
         new FeatherTableWriter( nrow, "test table", null, writers )
            .write( System.out );
     }
-
 }

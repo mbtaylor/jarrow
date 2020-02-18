@@ -10,6 +10,7 @@ JARFILE = jarrow.jar
 
 JSRC = \
        BufMapper.java \
+       BufUtils.java \
        ColStat.java \
        Decoder.java \
        DefaultColumnWriter.java \

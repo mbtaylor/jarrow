@@ -52,21 +52,6 @@ public abstract class Decoder<T> {
         }
     }
 
-    static int longToInt( long index ) {
-        int ix = (int) index;
-        if ( ix == index ) {
-            return ix;
-        }
-        else {
-            throw new RuntimeException( "Integer overflow!" );
-        }
-    }
-
-    static boolean isBitSet( ByteBuffer bbuf, long ix ) {
-        return ( bbuf.get( longToInt( ix / 8 ) )
-               & ( 1 << ((int) ix) % 8 ) ) != 0;
-    }
-
     private static Decoder<?>[] createTypeDecoders() {
         Decoder<?>[] decoders = new Decoder<?>[ 17 ];
         decoders[ Type.BOOL ] = new Decoder<Boolean>( Boolean.class, "BOOL" ) {
@@ -74,7 +59,7 @@ public abstract class Decoder<T> {
                                                  long nrow ) {
                 return new AbstractReader<Boolean>( Boolean.class ) {
                     private boolean get( long ix ) {
-                        return isBitSet( bbuf, ix );
+                        return BufUtils.isBitSet( bbuf, ix );
                     }
                     public Boolean getObject( long ix ) {
                         return Boolean.valueOf( get( ix ) );
@@ -105,7 +90,7 @@ public abstract class Decoder<T> {
                                               long nrow ) {
                 return new AbstractReader<Byte>( Byte.class ) {
                     private byte get( long ix ) {
-                        return bbuf.get( longToInt( ix ) );
+                        return bbuf.get( BufUtils.longToInt( ix ) );
                     }
                     public Byte getObject( long ix ) {
                         return Byte.valueOf( get( ix ) );
@@ -136,7 +121,7 @@ public abstract class Decoder<T> {
                 final ShortBuffer sbuf = bbuf.asShortBuffer();
                 return new ShortReader() {
                     short get( long ix ) {
-                        return sbuf.get( longToInt( ix ) );
+                        return sbuf.get( BufUtils.longToInt( ix ) );
                     }
                 };
             }
@@ -147,7 +132,7 @@ public abstract class Decoder<T> {
                 final IntBuffer ibuf = bbuf.asIntBuffer();
                 return new IntReader() {
                     int get( long ix ) {
-                        return ibuf.get( longToInt( ix ) );
+                        return ibuf.get( BufUtils.longToInt( ix ) );
                     }
                 };
             }
@@ -157,7 +142,7 @@ public abstract class Decoder<T> {
                 final LongBuffer lbuf = bbuf.asLongBuffer();
                 return new LongReader() {
                     long get( long ix ) {
-                        return lbuf.get( longToInt( ix ) );
+                        return lbuf.get( BufUtils.longToInt( ix ) );
                     }
                 };
             }
@@ -167,7 +152,8 @@ public abstract class Decoder<T> {
                                                long nrow ) {
                 return new ShortReader() {
                     short get( long ix ) {
-                        return (short) ( 0xff & bbuf.get( longToInt( ix ) ) );
+                        return (short)
+                               ( 0xff & bbuf.get( BufUtils.longToInt( ix ) ) );
                     }
                 };
             }
@@ -178,7 +164,7 @@ public abstract class Decoder<T> {
                 final ShortBuffer sbuf = bbuf.asShortBuffer();
                 return new IntReader() {
                     int get( long ix ) {
-                        return 0xffff & sbuf.get( longToInt( ix ) );
+                        return 0xffff & sbuf.get( BufUtils.longToInt( ix ) );
                     }
                 };
             }
@@ -188,7 +174,8 @@ public abstract class Decoder<T> {
                 final IntBuffer ibuf = bbuf.asIntBuffer();
                 return new LongReader() {
                     long get( long ix ) {
-                        return 0xffffffffL & ibuf.get( longToInt( ix ) );
+                        return 0xffffffffL
+                             & ibuf.get( BufUtils.longToInt( ix ) );
                     }
                 };
             }
@@ -199,7 +186,7 @@ public abstract class Decoder<T> {
                 final FloatBuffer fbuf = bbuf.asFloatBuffer();
                 return new AbstractReader<Float>( Float.class ) {
                     private float get( long ix ) {
-                        return fbuf.get( longToInt( ix ) );
+                        return fbuf.get( BufUtils.longToInt( ix ) );
                     }
                     public Float getObject( long ix ) {
                         return Float.valueOf( get( ix ) );
@@ -231,7 +218,7 @@ public abstract class Decoder<T> {
                 final DoubleBuffer dbuf = bbuf.asDoubleBuffer();
                 return new AbstractReader<Double>( Double.class ) {
                     private double get( long ix ) {
-                        return dbuf.get( longToInt( ix ) );
+                        return dbuf.get( BufUtils.longToInt( ix ) );
                     }
                     public Double getObject( long ix ) {
                         return Double.valueOf( get( ix ) );
@@ -291,7 +278,7 @@ public abstract class Decoder<T> {
                 final LongBuffer lbuf = bbuf.asLongBuffer();
                 return new LongReader() {
                     long get( long ix ) {
-                        return lbuf.get( longToInt( ix ) );
+                        return lbuf.get( BufUtils.longToInt( ix ) );
                     }
                 };
             }
@@ -301,7 +288,7 @@ public abstract class Decoder<T> {
                 final IntBuffer ibuf = bbuf.asIntBuffer();
                 return new IntReader() {
                     int get( long ix ) {
-                        return ibuf.get( longToInt( ix ) );
+                        return ibuf.get( BufUtils.longToInt( ix ) );
                     }
                 };
             }
@@ -311,7 +298,7 @@ public abstract class Decoder<T> {
                 final LongBuffer lbuf = bbuf.asLongBuffer();
                 return new LongReader() {
                     long get( long ix ) {
-                        return lbuf.get( longToInt( ix ) );
+                        return lbuf.get( BufUtils.longToInt( ix ) );
                     }
                 };
             }
@@ -450,12 +437,12 @@ public abstract class Decoder<T> {
             data0_ = ( ( ( nrow + 1 ) * OFFSET_SIZE + 7 ) / 8 ) * 8;
         }
         byte[] getBytes( long ix ) {
-            int ioff1 = longToInt( ( ix + 1 ) * OFFSET_SIZE );
+            int ioff1 = BufUtils.longToInt( ( ix + 1 ) * OFFSET_SIZE );
             int doff0 = bbuf_.getInt( ioff1 - OFFSET_SIZE );
             int doff1 = bbuf_.getInt( ioff1 );
             int leng = doff1 - doff0;
             byte[] dbuf = new byte[ leng ];
-            bbuf_.position( longToInt( data0_ + doff0 ) );
+            bbuf_.position( BufUtils.longToInt( data0_ + doff0 ) );
             bbuf_.get( dbuf );
             return dbuf;
         }
