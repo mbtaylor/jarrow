@@ -13,14 +13,12 @@ public class FeatherTableWriter {
 
     public static final int FEATHER_VERSION = 1;
 
-    private final long nrow_;
     private final String description_;
     private final String tableUserMeta_;
     private final FeatherColumnWriter[] colWriters_;
 
-    public FeatherTableWriter( long nrow, String description, String tableMeta,
+    public FeatherTableWriter( String description, String tableMeta,
                                FeatherColumnWriter[] colWriters ) {
-        nrow_ = nrow;
         description_ = description;
         tableUserMeta_ = tableMeta;
         colWriters_ = colWriters;
@@ -55,9 +53,12 @@ public class FeatherTableWriter {
         int nc = colWriters_.length;
         int[] colTags = new int[ nc ];
         long streamOffset = baseOffset;
+        long nrow = 0;
         for ( int ic = 0; ic < nc; ic++ ) {
             FeatherColumnWriter colWriter = colWriters_[ ic ];
             ColStat colStat = colStats[ ic ];
+            long nr = colStat.getRowCount();
+            nrow = ic == 0 ? nr : Math.min( nr, nrow );
 
             long internalOffset = colStat.getNullCount() == 0
                                 ? colStat.getDataOffset()
@@ -68,7 +69,7 @@ public class FeatherTableWriter {
             PrimitiveArray.startPrimitiveArray( builder );
             PrimitiveArray.addType( builder, colWriter.getFeatherType() );
             PrimitiveArray.addOffset( builder, offset );
-            PrimitiveArray.addLength( builder, nrow_ );
+            PrimitiveArray.addLength( builder, nr );
             PrimitiveArray.addNullCount( builder, colStat.getNullCount() );
             PrimitiveArray.addTotalBytes( builder, nbyte );
             int valuesTag = PrimitiveArray.endPrimitiveArray( builder );
@@ -86,7 +87,7 @@ public class FeatherTableWriter {
  
         CTable.startCTable( builder );
         CTable.addVersion( builder, FEATHER_VERSION );
-        CTable.addNumRows( builder, nrow_ );
+        CTable.addNumRows( builder, nrow );
         CTable.addDescription( builder, descriptionTag );
         CTable.addMetadata( builder, tableUserMetaTag );
         CTable.addColumns( builder, columnsTag );
@@ -131,7 +132,7 @@ public class FeatherTableWriter {
             PrimitiveArrayWriter.createDoubleWriter( "dcol", ddata, null ),
             VariableLengthWriter.createStringWriter( "tcol", tdata, null, false)
         };
-        new FeatherTableWriter( nrow, "test table", null, writers )
+        new FeatherTableWriter( "test table", null, writers )
            .write( System.out );
     }
 }

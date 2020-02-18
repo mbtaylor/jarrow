@@ -74,6 +74,9 @@ public abstract class AbstractColumnWriter implements FeatherColumnWriter {
         final long dataOffset = hasNull ? 0 : maskBytes;
         final long nullCount = nNull;
         return new ColStat() {
+            public long getRowCount() {
+                return nrow_;
+            }
             public long getByteCount() {
                 return byteCount;
             }
