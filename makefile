@@ -97,6 +97,9 @@ javadocs: $(JSRC) $(STIL_JSRC)
 data.fea: data.py
 	$(PYTHON) data.py
 
+big.fea: big.py
+	$(PYTHON) big.py
+
 $(STIL_JAR):
 	curl -OL http://www.starlink.ac.uk/stil/stil.jar
 
@@ -124,7 +127,7 @@ $(JARFILE): $(JSRC) $(STIL_JSRC) $(FBSRC) $(STIL_JAR) $(JSON_JAR)
 
 clean:
 	rm -f $(JARFILE) $(NAMESPACE)_metadata.fbs $(JSON_JAR) $(STIL_JAR) \
-              test.fea x.fea x.vot
+              test.fea x.fea x.vot big.fea
 	rm -rf tmp javadocs
 
 veryclean: clean
