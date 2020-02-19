@@ -3,9 +3,14 @@ package jarrow.feather;
 import jarrow.fbs.Type;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 
 public abstract class VariableLengthWriter extends AbstractColumnWriter {
+
     private final long nrow_;
+    private static final Logger logger_ =
+        Logger.getLogger( VariableLengthWriter.class.getName() );
+
     VariableLengthWriter( String name, byte type, long nrow,
                           boolean isNullable, String userMeta ) {
         super( name, type, nrow, isNullable, userMeta );
@@ -17,20 +22,36 @@ public abstract class VariableLengthWriter extends AbstractColumnWriter {
             throws IOException;
 
     public long writeDataBytes( OutputStream out ) throws IOException {
-        int ioff = 0;
-        for ( int ir = 0; ir < nrow_; ir++ ) {
-            BufUtils.writeLittleEndianInt( out, ioff );
-            ioff += getByteSize( ir );
-        }
-        BufUtils.writeLittleEndianInt( out, ioff );
-        long nbyteIndex = 4 * ( nrow_ + 1 );
-        nbyteIndex += BufUtils.align8( out, nbyteIndex );
-        long nbyteData = ioff;
-        for ( int ir = 0; ir < nrow_; ir++ ) {
+        IndexStatus status = writeOffsets( out );
+        long nbyteData = status.byteCount_;
+        long nbyteOffsets = 4 * ( nrow_ + 1 );
+        nbyteOffsets += BufUtils.align8( out, nbyteOffsets );
+        long nentry = status.entryCount_;
+        for ( long ir = 0; ir < nentry; ir++ ) {
             writeItem( ir, out );
         }
         nbyteData += BufUtils.align8( out, nbyteData );
-        return nbyteIndex + nbyteData;
+        return nbyteOffsets + nbyteData;
+    }
+
+    public IndexStatus writeOffsets( OutputStream out ) throws IOException {
+        long ioff = 0;
+        for ( long ir = 0; ir < nrow_; ir++ ) {
+            BufUtils.writeLittleEndianInt( out, (int) ioff );
+            long ioff1 = ioff + getByteSize( ir );
+            if ( ioff1 >= Integer.MAX_VALUE ) {
+                logger_.warning( "Pointer overflow - empty values in column "
+                               + getName() + " past row " + ir );
+                IndexStatus status = new IndexStatus( ir, ioff );
+                for ( ; ir < nrow_; ir++ ) {
+                    BufUtils.writeLittleEndianInt( out, (int) ioff );
+                }
+                return status;
+            }
+            ioff = ioff1;
+        }
+        BufUtils.writeLittleEndianInt( out, (int) ioff );
+        return new IndexStatus( nrow_, ioff );
     }
 
     public static FeatherColumnWriter
@@ -53,5 +74,14 @@ public abstract class VariableLengthWriter extends AbstractColumnWriter {
                 }
             }
         };
+    }
+
+    private static class IndexStatus {
+        final long entryCount_;
+        final long byteCount_;
+        IndexStatus( long entryCount, long byteCount ) {
+            entryCount_ = entryCount;
+            byteCount_ = byteCount;
+        }
     }
 }

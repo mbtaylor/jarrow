@@ -5,6 +5,7 @@ import jarrow.feather.ColStat;
 import jarrow.feather.FeatherColumnWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 import org.json.JSONObject;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.RowSequence;
@@ -15,6 +16,8 @@ public class EncoderColumnWriter implements FeatherColumnWriter {
     private final StarTable table_;
     private final int icol_;
     private final FeatherEncoder encoder_;
+    private static final Logger logger_ =
+        Logger.getLogger( EncoderColumnWriter.class.getName() );
 
     public EncoderColumnWriter( StarTable table, int icol,
                                 FeatherEncoder encoder ) {
@@ -84,36 +87,45 @@ public class EncoderColumnWriter implements FeatherColumnWriter {
 
         /* Write offset array, if applicable. */
         final long indexBytes;
+        final IndexStatus ixStat;
         if ( encoder_.isVariableLength() ) {
             long nrow = 0;
             RowSequence rseq = table_.getRowSequence();
             try {
-                int ioff = 0;
-                while ( rseq.next() ) {
-                    nrow++;
-                    BufUtils.writeLittleEndianInt( out, ioff );
-                    ioff += encoder_.getByteSize( rseq.getCell( icol_ ) );
-                }
-                BufUtils.writeLittleEndianInt( out, ioff );
+                ixStat = writeOffsets( out, rseq );
             }
             finally {
                 rseq.close();
             }
-            long ixb = 4 * ( nrow + 1 );
+            long ixb = 4 * ( ixStat.rowCount_ + 1 );
             indexBytes = ixb + BufUtils.align8( out, ixb );
         }
         else {
+            ixStat = null;
             indexBytes = 0;
         }
 
         /* Write data. */
-        long nrow = 0;
+        long nrow;
         long dataBytes = 0;
         RowSequence rseq = table_.getRowSequence();
         try {
-            while ( rseq.next() ) {
-                nrow++;
-                dataBytes += encoder_.writeBytes( out, rseq.getCell( icol_ ) );
+            if ( ixStat == null ) {
+                nrow = 0;
+                while ( rseq.next() ) {
+                    dataBytes +=
+                        encoder_.writeBytes( out, rseq.getCell( icol_ ) );
+                    nrow++;
+                }
+            }
+            else {
+                long entryLimit = ixStat.entryCount_;
+                for ( long ir = 0; rseq.next() && ir < entryLimit; ir++ ) {
+                    dataBytes +=
+                        encoder_.writeBytes( out, rseq.getCell( icol_ ) );
+                }
+                assert dataBytes == ixStat.byteCount_;
+                nrow = ixStat.rowCount_;
             }
         }
         finally {
@@ -143,9 +155,45 @@ public class EncoderColumnWriter implements FeatherColumnWriter {
         };
     }
 
+    private IndexStatus writeOffsets( OutputStream out, RowSequence rseq )
+            throws IOException {
+        long nrow = 0;
+        long ioff = 0;
+        while ( rseq.next() ) {
+            BufUtils.writeLittleEndianInt( out, (int) ioff );
+            long ioff1 = ioff + encoder_.getByteSize( rseq.getCell( icol_ ) );
+            if ( ioff1 >= Integer.MAX_VALUE ) {
+                logger_.warning( "Pointer overflow - empty values in column "
+                               + table_.getColumnInfo( icol_ ).getName()
+                               + " past row " + nrow );
+                long entryCount = nrow;
+                do {
+                    BufUtils.writeLittleEndianInt( out, (int) ioff );
+                    nrow++;
+                } while ( rseq.next() );
+                return new IndexStatus( nrow, entryCount, ioff );
+            }
+            ioff = ioff1;
+            nrow++;
+        }
+        BufUtils.writeLittleEndianInt( out, (int) ioff );
+        return new IndexStatus( nrow, nrow, ioff );
+    }
+
     private static void addEntry( JSONObject json, String key, String value ) {
         if ( value != null && value.trim().length() > 0 ) {
             json.put( key, value );
         }
-    }   
+    }
+
+    private static class IndexStatus {
+        final long rowCount_;
+        final long entryCount_;
+        final long byteCount_;
+        IndexStatus( long rowCount, long entryCount, long byteCount ) {
+            rowCount_ = rowCount;
+            entryCount_ = entryCount;
+            byteCount_ = byteCount;
+        }
+    }
 }
