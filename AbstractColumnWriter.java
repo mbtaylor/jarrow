@@ -50,9 +50,9 @@ public abstract class AbstractColumnWriter implements FeatherColumnWriter {
             for ( long ir = 0; ir < nrow_; ir++ ) {
                 if ( isNull( ir ) ) {
                     nNull++;
-                    mask |= 1 << ibit++;
+                    mask |= 1 << ibit;
                 }
-                if ( ibit == 8 ) {
+                if ( ibit++ == 8 ) {
                     out.write( mask );
                     ibit = 0;
                     mask = 0;
@@ -70,8 +70,8 @@ public abstract class AbstractColumnWriter implements FeatherColumnWriter {
         long dataBytes = writeDataBytes( out );
         dataBytes += BufUtils.align8( out, dataBytes );
         boolean hasNull = nNull > 0;
-        final long byteCount = hasNull ? maskBytes + dataBytes : dataBytes;
-        final long dataOffset = hasNull ? 0 : maskBytes;
+        final long byteCount = maskBytes + dataBytes;
+        final long dataOffset = maskBytes;
         final long nullCount = nNull;
         return new ColStat() {
             public long getRowCount() {

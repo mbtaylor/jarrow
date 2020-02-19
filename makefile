@@ -6,7 +6,7 @@ JAVADOC_FLAGS = -Xdoclint:none
 
 STIL_JAR = stil.jar
 JSON_JAR = json.jar
-STILTS = stilts -classpath $(JARFILE):$(JSON_JAR)
+STILTS = stilts -J-ea -classpath $(JARFILE):$(JSON_JAR)
 
 FLATC = /mbt/github/flatbuffers/flatc
 
@@ -27,12 +27,12 @@ JSRC = \
        VariableLengthWriter.java \
 
 STIL_JSRC = \
+       EncoderColumnWriter.java \
        FeatherEncoder.java \
        FeatherEncoders.java \
        FeatherStarTable.java \
        FeatherStarTableWriter.java \
        FeatherTableBuilder.java \
-       StarFeatherColumnWriter.java \
 
 FBSRC = \
        fbs/com/google/flatbuffers/ByteBufferUtil.java \
@@ -68,11 +68,16 @@ rw: test.fea
 rws: data.fea $(JARFILE) $(JSON_JAR)
 	$(STILTS) tpipe \
                in=data.fea ifmt=uk.ac.starlink.feather.FeatherTableBuilder \
+               cmd='colmeta -units km/s 1' \
+               cmd='colmeta -ucd meta.code 2' \
                out=x.vot && \
 	$(STILTS) tpipe in=x.vot && \
         $(STILTS) tpipe \
                in=x.vot \
                ofmt=uk.ac.starlink.feather.FeatherStarTableWriter out=x.fea && \
+        $(STILTS) tpipe \
+               in=x.fea ifmt=uk.ac.starlink.feather.FeatherTableBuilder \
+               cmd=meta && \
         $(STILTS) tpipe \
                in=x.fea ifmt=uk.ac.starlink.feather.FeatherTableBuilder \
 

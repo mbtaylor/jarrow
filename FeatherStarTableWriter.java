@@ -45,7 +45,7 @@ public class FeatherStarTableWriter extends StreamStarTableWriter {
             Class<?> clazz = colInfo.getContentClass();
             FeatherEncoder encoder = FeatherEncoders.getEncoder( clazz );
             if ( encoder != null ) {
-                fcwList.add( new StarFeatherColumnWriter( table, ic, encoder ));
+                fcwList.add( new EncoderColumnWriter( table, ic, encoder ) );
             }
             else {
                 logger_.warning( "Can't encode column " + colInfo + " to "

@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 public class BufUtils {
 
@@ -88,13 +89,19 @@ public class BufUtils {
         return pad;
     }
 
-    public static int utf8Length( CharSequence cseq ) {
+    public static byte[] marker8( byte value ) {
+        byte[] buf = new byte[ 8 ];
+        Arrays.fill( buf, value );
+        return buf;
+    }
+
+    public static int utf8Length( String txt ) {
 
         // copied from https://stackoverflow.com/questions/8511490
         int count = 0;
-        int nc = cseq.length();
+        int nc = txt.length();
         for ( int i = 0; i < nc; i++ ) {
-            char ch = cseq.charAt( i );
+            char ch = txt.charAt( i );
             if ( ch <= 0x7F ) {
                 count++;
             }
@@ -109,6 +116,7 @@ public class BufUtils {
                 count += 3;
             }
         }
+        assert count == txt.getBytes( UTF8 ).length;
         return count;
     }
 }

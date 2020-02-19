@@ -10,14 +10,14 @@ import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 
-public class StarFeatherColumnWriter implements FeatherColumnWriter {
+public class EncoderColumnWriter implements FeatherColumnWriter {
 
     private final StarTable table_;
     private final int icol_;
     private final FeatherEncoder encoder_;
 
-    public StarFeatherColumnWriter( StarTable table, int icol,
-                                    FeatherEncoder encoder ) {
+    public EncoderColumnWriter( StarTable table, int icol,
+                                FeatherEncoder encoder ) {
         table_ = table;
         icol_ = icol;
         encoder_ = encoder;
@@ -39,12 +39,11 @@ public class StarFeatherColumnWriter implements FeatherColumnWriter {
         addEntry( json, "utype", info.getUtype() );
         addEntry( json, "description", info.getDescription() );
         return json.length() > 0
-             ? json.toString( 0 ).replaceAll( "\n", "" )
+             ? json.toString( 0 ).replaceAll( "\n", " " )
              : null;
     }
 
     public ColStat writeColumnBytes( OutputStream out ) throws IOException {
-
 
         /* Write mask, if applicable. */
         long nnull = 0;
@@ -61,20 +60,20 @@ public class StarFeatherColumnWriter implements FeatherColumnWriter {
                     nrow++;
                     if ( encoder_.isNull( rseq.getCell( icol_ ) ) ) {
                         nnull++;
-                        mask |= 1 << ibit++;
+                        mask |= 1 << ibit;
                     }
-                    if ( ibit == 8 ) {
+                    if ( ibit++ == 8 ) {
                         out.write( mask );
                         ibit = 0;
                         mask = 0;
                     }
                 }
-                if ( ibit > 0 ) {
-                    out.write( mask );
-                }
             }
             finally {
                 rseq.close();
+            }
+            if ( ibit > 0 ) {
+                out.write( mask );
             }
             long mb = ( nrow + 7 ) / 8;
             maskBytes = mb + BufUtils.align8( out, mb );
@@ -91,9 +90,9 @@ public class StarFeatherColumnWriter implements FeatherColumnWriter {
             try {
                 int ioff = 0;
                 while ( rseq.next() ) {
+                    nrow++;
                     BufUtils.writeLittleEndianInt( out, ioff );
                     ioff += encoder_.getByteSize( rseq.getCell( icol_ ) );
-                    nrow++;
                 }
                 BufUtils.writeLittleEndianInt( out, ioff );
             }
@@ -125,8 +124,8 @@ public class StarFeatherColumnWriter implements FeatherColumnWriter {
 
         /* Prepare and return summary. */
         final long rowCount = nrow;
-        final long dataOffset = hasNull ? 0 : maskBytes;
-        final long byteCount = maskBytes + indexBytes + dataBytes - dataOffset;
+        final long dataOffset = maskBytes;
+        final long byteCount = maskBytes + indexBytes + dataBytes;
         final long nullCount = nnull;
         return new ColStat() {
             public long getRowCount() {

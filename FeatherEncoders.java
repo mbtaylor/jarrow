@@ -82,7 +82,7 @@ public class FeatherEncoders {
             return new BooleanEncoder( true );
         }
         else if ( String.class.equals( clazz ) ) {
-            return new VariableLengthEncoder( Type.UTF8, true ) {
+            return new VariableLengthEncoder( Type.UTF8, false ) {
                 public int getByteSize( Object value ) {
                     return value instanceof String
                          ? BufUtils.utf8Length( ((String) value) )

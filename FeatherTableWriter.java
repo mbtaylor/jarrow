@@ -58,9 +58,9 @@ public class FeatherTableWriter {
             FeatherColumnWriter colWriter = colWriters_[ ic ];
             ColStat colStat = colStats[ ic ];
             long nr = colStat.getRowCount();
+            long nnull = colStat.getNullCount();
             nrow = ic == 0 ? nr : Math.min( nr, nrow );
-
-            long internalOffset = colStat.getNullCount() == 0
+            long internalOffset = nnull == 0
                                 ? colStat.getDataOffset()
                                 : 0;
             long offset = streamOffset + internalOffset;
@@ -70,7 +70,7 @@ public class FeatherTableWriter {
             PrimitiveArray.addType( builder, colWriter.getFeatherType() );
             PrimitiveArray.addOffset( builder, offset );
             PrimitiveArray.addLength( builder, nr );
-            PrimitiveArray.addNullCount( builder, colStat.getNullCount() );
+            PrimitiveArray.addNullCount( builder, nnull );
             PrimitiveArray.addTotalBytes( builder, nbyte );
             int valuesTag = PrimitiveArray.endPrimitiveArray( builder );
 
