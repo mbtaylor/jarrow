@@ -13,15 +13,18 @@ public class FeatherColumn {
     private final Decoder<?> decoder_;
     private final long nNull_;
     private final String userMeta_;
+    private final byte featherType_;
 
     public FeatherColumn( String name, long nrow, BufMapper mapper,
-                          Decoder<?> decoder, long nNull, String userMeta ) {
+                          Decoder<?> decoder, long nNull, String userMeta,
+                          byte featherType ) {
         name_ = name;
         nrow_ = nrow;
         mapper_ = mapper;
         decoder_ = decoder;
         nNull_ = nNull;
         userMeta_ = userMeta;
+        featherType_ = featherType;
     }
 
     public String getName() {
@@ -30,6 +33,10 @@ public class FeatherColumn {
 
     public Class<?> getValueClass() {
         return decoder_.getValueClass();
+    }
+
+    public byte getFeatherType() {
+        return featherType_;
     }
 
     public long getRowCount() {

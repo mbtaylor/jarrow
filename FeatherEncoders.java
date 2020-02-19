@@ -127,6 +127,15 @@ public class FeatherEncoders {
         }
     }
 
+    public static FeatherEncoder getUbyteEncoder() {
+        return new NumberEncoder( Type.UINT8, true, new byte[ 1 ] ) {
+            public void writeNumber( OutputStream out, Number val )
+                    throws IOException {
+                out.write( val.shortValue() );
+            }
+        };
+    }
+
     private static abstract class NumberEncoder implements FeatherEncoder {
 
         final byte featherType_;

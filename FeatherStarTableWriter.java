@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StreamStarTableWriter;
+import uk.ac.starlink.table.Tables;
 
 public class FeatherStarTableWriter extends StreamStarTableWriter {
 
@@ -43,7 +44,14 @@ public class FeatherStarTableWriter extends StreamStarTableWriter {
         for ( int ic = 0; ic < ncol; ic++ ) {
             ColumnInfo colInfo = table.getColumnInfo( ic );
             Class<?> clazz = colInfo.getContentClass();
-            FeatherEncoder encoder = FeatherEncoders.getEncoder( clazz );
+            boolean isUbyte =
+                clazz.equals( Short.class ) &&
+                Boolean.TRUE
+               .equals( colInfo.getAuxDatumValue( Tables.UBYTE_FLAG_INFO,
+                                                  Boolean.class ) );
+            FeatherEncoder encoder =
+                isUbyte ? FeatherEncoders.getUbyteEncoder()
+                        : FeatherEncoders.getEncoder( clazz );
             if ( encoder != null ) {
                 fcwList.add( new EncoderColumnWriter( table, ic, encoder ) );
             }

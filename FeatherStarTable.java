@@ -1,5 +1,6 @@
 package uk.ac.starlink.feather;
 
+import jarrow.fbs.Type;
 import jarrow.feather.FeatherColumn;
 import jarrow.feather.FeatherTable;
 import jarrow.feather.Reader;
@@ -10,7 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import uk.ac.starlink.table.AbstractStarTable;
 import uk.ac.starlink.table.ColumnInfo;
+import uk.ac.starlink.table.DescribedValue;
 import uk.ac.starlink.table.RowSequence;
+import uk.ac.starlink.table.Tables;
 
 public class FeatherStarTable extends AbstractStarTable {
 
@@ -92,8 +95,8 @@ public class FeatherStarTable extends AbstractStarTable {
     }
 
     private static ColumnInfo getColumnInfo( FeatherColumn fcol ) {
-        ColumnInfo info =
-            new ColumnInfo( fcol.getName(), fcol.getValueClass(), null );
+        Class<?> clazz = fcol.getValueClass();
+        ColumnInfo info = new ColumnInfo( fcol.getName(), clazz, null );
         info.setNullable( fcol.getNullCount() > 0 );
         Map<String,String> metaMap = getMetaMap( fcol.getUserMeta() );
         for ( Map.Entry<String,String> entry : metaMap.entrySet() ) {
@@ -111,6 +114,11 @@ public class FeatherStarTable extends AbstractStarTable {
             if ( key.equals( DESCRIPTION_KEY ) ) {
                 info.setDescription( value );
             }
+        }
+        if ( fcol.getFeatherType() == Type.UINT8 &&
+             clazz.equals( Short.class ) ) {
+            info.setAuxDatum( new DescribedValue( Tables.UBYTE_FLAG_INFO,
+                                                  Boolean.TRUE ) );
         }
         return info;
     }
