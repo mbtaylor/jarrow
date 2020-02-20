@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import uk.ac.starlink.table.AbstractStarTable;
 import uk.ac.starlink.table.ColumnInfo;
+import uk.ac.starlink.table.DefaultValueInfo;
 import uk.ac.starlink.table.DescribedValue;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.Tables;
@@ -24,11 +25,13 @@ public class FeatherStarTable extends AbstractStarTable {
     private final FeatherColumn[] fcols_;
     private final ColumnInfo[] colInfos_;
     private final RowReader randomReader_;
-    private static final String UCD_KEY = "ucd";
-    private static final String UTYPE_KEY = "utype";
-    private static final String UNIT_KEY = "unit";
-    private static final String DESCRIPTION_KEY = "description";
-    private static final String META_KEY = "meta";
+
+    public static final String UCD_KEY = "ucd";
+    public static final String UTYPE_KEY = "utype";
+    public static final String UNIT_KEY = "unit";
+    public static final String DESCRIPTION_KEY = "description";
+    public static final String SHAPE_KEY = "shape";
+    public static final String META_KEY = "meta";
 
     public FeatherStarTable( FeatherTable ftable ) {
         ftable_ = ftable;
@@ -56,6 +59,10 @@ public class FeatherStarTable extends AbstractStarTable {
         return true;
     }
 
+    public String getName() {
+        return name_;
+    }
+
     public ColumnInfo getColumnInfo( int icol ) {
         return colInfos_[ icol ];
     }
@@ -74,20 +81,32 @@ public class FeatherStarTable extends AbstractStarTable {
         final RowReader rowReader = new RowReader();
         return new RowSequence() {
             long irow_ = -1;
+            boolean hasData_ = false;
             public boolean next() {
                 if ( irow_ < nrow_ - 1 ) {
                     irow_++;
-                    return true;
+                    hasData_ = true;
                 }
                 else {
-                    return false;
+                    hasData_ = false;
                 }
+                return hasData_;
             }
             public Object getCell( int icol ) throws IOException {
-                return rowReader.getCell( irow_, icol );
+                if ( hasData_ ) {
+                    return rowReader.getCell( irow_, icol );
+                }
+                else {
+                    throw new IllegalStateException();
+                }
             }
             public Object[] getRow() throws IOException {
-                return rowReader.getRow( irow_ );
+                if ( hasData_ ) {
+                    return rowReader.getRow( irow_ );
+                }
+                else {
+                    throw new IllegalStateException();
+                }
             }
             public void close() {
             }
@@ -114,6 +133,9 @@ public class FeatherStarTable extends AbstractStarTable {
             if ( key.equals( DESCRIPTION_KEY ) ) {
                 info.setDescription( value );
             }
+            if ( key.equals( SHAPE_KEY ) ) {
+                info.setShape( DefaultValueInfo.unformatShape( value ) );
+            }
         }
         if ( fcol.getFeatherType() == Type.UINT8 &&
              clazz.equals( Short.class ) ) {
@@ -129,19 +151,12 @@ public class FeatherStarTable extends AbstractStarTable {
             try {
                 JSONObject json = new JSONObject( userMeta );
                 for ( String key : json.keySet() ) {
-                    String lkey = key.toLowerCase();
-                    Object value = json.get( key );
-                    if ( key.equals( "ucd" ) ) {
-                        map.put( UCD_KEY, value.toString() );
-                    }
-                    else if ( key.equals( "utype" ) ) {
-                        map.put( UTYPE_KEY, value.toString() );
-                    }
-                    else if ( key.equals( "unit" ) || key.equals( "units" ) ) {
-                        map.put( UNIT_KEY, value.toString() );
-                    }
-                    else if ( key.equals( "description" ) ) {
-                        map.put( DESCRIPTION_KEY, value.toString() );
+                    if ( key.equals( UCD_KEY ) ||
+                         key.equals( UTYPE_KEY ) ||
+                         key.equals( UNIT_KEY ) ||
+                         key.equals( DESCRIPTION_KEY ) ||
+                         key.equals( SHAPE_KEY ) ) {
+                        map.put( key, json.get( key ).toString() );
                     }
                 }
             }

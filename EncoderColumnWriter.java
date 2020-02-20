@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.logging.Logger;
 import org.json.JSONObject;
 import uk.ac.starlink.table.ColumnInfo;
+import uk.ac.starlink.table.DefaultValueInfo;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 
@@ -37,10 +38,13 @@ public class EncoderColumnWriter implements FeatherColumnWriter {
     public String getUserMetadata() {
         ColumnInfo info = table_.getColumnInfo( icol_ );
         JSONObject json = new JSONObject();
-        addEntry( json, "unit", info.getUnitString() );
-        addEntry( json, "ucd", info.getUCD() );
-        addEntry( json, "utype", info.getUtype() );
-        addEntry( json, "description", info.getDescription() );
+        addEntry( json, FeatherStarTable.UNIT_KEY, info.getUnitString() );
+        addEntry( json, FeatherStarTable.UCD_KEY, info.getUCD() );
+        addEntry( json, FeatherStarTable.UTYPE_KEY, info.getUtype() );
+        addEntry( json, FeatherStarTable.DESCRIPTION_KEY,
+                  info.getDescription() );
+        addEntry( json, FeatherStarTable.SHAPE_KEY,
+                  DefaultValueInfo.formatShape( info.getShape() ) );
         return json.length() > 0
              ? json.toString( 0 ).replaceAll( "\n", " " )
              : null;

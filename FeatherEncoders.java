@@ -78,9 +78,6 @@ public class FeatherEncoders {
                 }
             };
         }
-        else if ( Boolean.class.equals( clazz ) ) {
-            return new BooleanEncoder( true );
-        }
         else if ( String.class.equals( clazz ) ) {
             return new VariableLengthEncoder( Type.UTF8, false ) {
                 public int getByteSize( Object value ) {
@@ -187,42 +184,6 @@ public class FeatherEncoders {
                 out.write( blank_ );
             }
             return nbyte_;
-        }
-    }
-
-    private static class BooleanEncoder implements FeatherEncoder {
-        final boolean isNullable_;
-
-        BooleanEncoder( boolean isNullable ) {
-            isNullable_ = isNullable;
-        }
-
-        public byte getFeatherType() {
-            return Type.BOOL;
-        }
-
-        public boolean isNullable() {
-            return isNullable_;
-        }
-
-        public boolean isVariableLength() {
-            return false;
-        }
-
-        public boolean isNull( Object value ) {
-            assert isNullable_;
-            return ! ( value instanceof Boolean );
-        }
-
-        public int getByteSize( Object value ) {
-            assert false;
-            return 1;
-        }
-
-        public int writeBytes( OutputStream out, Object value )
-                throws IOException {
-            out.write( Boolean.TRUE.equals( value ) ? 1 : 0 );
-            return 1;
         }
     }
 

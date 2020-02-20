@@ -14,6 +14,7 @@ JARFILE = jarrow.jar
 
 JSRC = \
        AbstractColumnWriter.java \
+       BooleanColumnWriter.java \
        BufMapper.java \
        BufUtils.java \
        ColStat.java \

@@ -13,6 +13,8 @@ import uk.ac.starlink.table.TableSink;
 import uk.ac.starlink.util.Compression;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
+import uk.ac.starlink.util.URLDataSource;
+import uk.ac.starlink.util.URLUtils;
 
 public class FeatherTableBuilder implements TableBuilder {
 
@@ -29,9 +31,8 @@ public class FeatherTableBuilder implements TableBuilder {
         if ( ! FeatherTable.isMagic( datsrc.getIntro() ) ) {
             throw new TableFormatException( "No FEA1 magic number" );
         }
-        if ( datsrc instanceof FileDataSource &&
-             datsrc.getCompression() == Compression.NONE ) {
-            File ffile = ((FileDataSource) datsrc).getFile();
+        File ffile = getFile( datsrc );
+        if ( ffile != null && datsrc.getCompression() == Compression.NONE ) {
             return new FeatherStarTable( FeatherTable.fromFile( ffile ) );
         }
         else {
@@ -47,5 +48,18 @@ public class FeatherTableBuilder implements TableBuilder {
     public void streamStarTable( InputStream in, TableSink sink, String pos )
             throws IOException {
         throw new TableFormatException( "Can't stream from Feather format" );
+    }
+
+    private static File getFile( DataSource datsrc ) {
+        if ( datsrc instanceof FileDataSource ) {
+            return ((FileDataSource) datsrc).getFile();
+        }
+        else if ( datsrc instanceof URLDataSource ) {
+            return URLUtils
+                  .urlToFile( ((URLDataSource) datsrc).getURL().toString() );
+        }
+        else {
+            return null;
+        }
     }
 }
