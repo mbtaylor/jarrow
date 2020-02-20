@@ -94,29 +94,29 @@ public class FeatherColumn {
     private static <T> Reader<T> createMaskReader( final Reader<T> basicReader,
                                                    final ByteBuffer maskBuf ) {
         return new Reader<T>() {
-            private boolean isNull( long ix ) {
+            private boolean isMask( long ix ) {
                 return BufUtils.isBitSet( maskBuf, ix );
             }
             public T getObject( long ix ) {
-                return isNull( ix ) ? basicReader.getObject( ix ) : null;
+                return isMask( ix ) ? basicReader.getObject( ix ) : null;
             }
             public byte getByte( long ix ) {
-                return isNull( ix ) ? basicReader.getByte( ix ) : null;
+                return isMask( ix ) ? basicReader.getByte( ix ) : null;
             }
             public short getShort( long ix ) {
-                return isNull( ix ) ? basicReader.getShort( ix ) : null;
+                return isMask( ix ) ? basicReader.getShort( ix ) : null;
             }
             public int getInt( long ix ) {
-                return isNull( ix ) ? basicReader.getInt( ix ) : null;
+                return isMask( ix ) ? basicReader.getInt( ix ) : null;
             }
             public long getLong( long ix ) {
-                return isNull( ix ) ? basicReader.getLong( ix ) : null;
+                return isMask( ix ) ? basicReader.getLong( ix ) : null;
             }
             public float getFloat( long ix ) {
-                return isNull( ix ) ? basicReader.getFloat( ix ) : Float.NaN;
+                return isMask( ix ) ? basicReader.getFloat( ix ) : Float.NaN;
             }
             public double getDouble( long ix ) {
-                return isNull( ix ) ? basicReader.getDouble( ix ) : Double.NaN;
+                return isMask( ix ) ? basicReader.getDouble( ix ) : Double.NaN;
             }
             public Class<T> getValueClass() {
                 return basicReader.getValueClass();

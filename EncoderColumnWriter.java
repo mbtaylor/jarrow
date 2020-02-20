@@ -63,9 +63,11 @@ public class EncoderColumnWriter implements FeatherColumnWriter {
                     nrow++;
                     if ( encoder_.isNull( rseq.getCell( icol_ ) ) ) {
                         nnull++;
+                    }
+                    else {
                         mask |= 1 << ibit;
                     }
-                    if ( ibit++ == 8 ) {
+                    if ( ++ibit == 8 ) {
                         out.write( mask );
                         ibit = 0;
                         mask = 0;

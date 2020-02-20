@@ -50,9 +50,11 @@ public abstract class AbstractColumnWriter implements FeatherColumnWriter {
             for ( long ir = 0; ir < nrow_; ir++ ) {
                 if ( isNull( ir ) ) {
                     nNull++;
+                }
+                else {
                     mask |= 1 << ibit;
                 }
-                if ( ibit++ == 8 ) {
+                if ( ++ibit == 8 ) {
                     out.write( mask );
                     ibit = 0;
                     mask = 0;

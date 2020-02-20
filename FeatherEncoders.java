@@ -211,7 +211,7 @@ public class FeatherEncoders {
 
         public boolean isNull( Object value ) {
             assert isNullable_;
-            return value instanceof Boolean;
+            return ! ( value instanceof Boolean );
         }
 
         public int getByteSize( Object value ) {
