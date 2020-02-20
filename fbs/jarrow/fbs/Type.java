@@ -2,6 +2,14 @@
 
 package jarrow.fbs;
 
+/**
+ * Feather is an experimental serialization format implemented using
+ * techniques from Apache Arrow. It was created as a proof-of-concept of an
+ * interoperable file format for storing data frames originating in Python or
+ * R. It enabled the developers to sidestep some of the open design questions
+ * in Arrow from early 2016 and instead create something simple and useful for
+ * the intended use cases.
+ */
 public final class Type {
   private Type() { }
   public static final byte BOOL = 0;
@@ -21,8 +29,10 @@ public final class Type {
   public static final byte TIMESTAMP = 14;
   public static final byte DATE = 15;
   public static final byte TIME = 16;
+  public static final byte LARGE_UTF8 = 17;
+  public static final byte LARGE_BINARY = 18;
 
-  public static final String[] names = { "BOOL", "INT8", "INT16", "INT32", "INT64", "UINT8", "UINT16", "UINT32", "UINT64", "FLOAT", "DOUBLE", "UTF8", "BINARY", "CATEGORY", "TIMESTAMP", "DATE", "TIME", };
+  public static final String[] names = { "BOOL", "INT8", "INT16", "INT32", "INT64", "UINT8", "UINT16", "UINT32", "UINT64", "FLOAT", "DOUBLE", "UTF8", "BINARY", "CATEGORY", "TIMESTAMP", "DATE", "TIME", "LARGE_UTF8", "LARGE_BINARY", };
 
   public static String name(int e) { return names[e]; }
 }

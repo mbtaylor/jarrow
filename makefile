@@ -112,9 +112,9 @@ $(STILTS_JAR):
 $(JSON_JAR):
 	cp /mbt/starjava/lib/ttools/json.jar .
 
-$(NAMESPACE)_metadata.fbs: feather_metadata.fbs
+$(NAMESPACE)_metadata.fbs: feather.fbs
 	sed -e 's/^namespace.*/namespace $(NAMESPACE).fbs;/' \
-            <feather_metadata.fbs >$@
+            <feather.fbs >$@
 
 fbs/$(NAMESPACE): $(NAMESPACE)_metadata.fbs
 	rm -rf fbs/$(NAMESPACE)
