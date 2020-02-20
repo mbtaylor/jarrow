@@ -2,7 +2,8 @@ import pandas
 import pyarrow.feather as feather
 
 d = {
-   "ic": [-1,2,-3,4],
+   "ic": [-1,None,-3,4],
+   "nc": [-1,2,-3,4],
    "dc": [10.,None,12.,13.],
    "bc": [True, None, False, True],
    "sc": ["red", None, "blue", "puce"],

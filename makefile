@@ -6,7 +6,9 @@ JAVADOC_FLAGS = -Xdoclint:none
 
 STIL_JAR = stil.jar
 JSON_JAR = json.jar
-STILTS = stilts -J-ea -classpath $(JARFILE):$(JSON_JAR)
+STILTS_JAR = stilts.jar
+STILTS = java -ea -classpath $(JARFILE):$(STILTS_JAR) \
+         uk.ac.starlink.ttools.Stilts
 
 FLATC = /mbt/github/flatbuffers/flatc
 
@@ -66,11 +68,11 @@ write: test.fea
 rw: test.fea
 	java -ea -classpath $(JARFILE) jarrow.feather.FeatherTable test.fea
 
-rws: data.fea $(JARFILE) $(JSON_JAR)
+rws: data.fea $(JARFILE) $(JSON_JAR) $(STILTS_JAR)
 	$(STILTS) tpipe \
                in=data.fea ifmt=uk.ac.starlink.feather.FeatherTableBuilder \
-               cmd='colmeta -units km/s 1' \
-               cmd='colmeta -ucd meta.code 2' \
+               cmd='colmeta -units km/s 2' \
+               cmd='colmeta -ucd meta.code 3' \
                out=x.vot && \
 	$(STILTS) tpipe in=x.vot && \
         $(STILTS) tpipe \
@@ -104,6 +106,9 @@ big.fea: big.py
 $(STIL_JAR):
 	curl -OL http://www.starlink.ac.uk/stil/stil.jar
 
+$(STILTS_JAR):
+	cp /mbt/starjava/lib/ttools/stilts.jar .
+
 $(JSON_JAR):
 	cp /mbt/starjava/lib/ttools/json.jar .
 
@@ -132,7 +137,7 @@ clean:
 	rm -rf tmp javadocs
 
 veryclean: clean
-	rm -f $(NAMESPACE)_metadata.fbs data.fea
+	rm -f $(NAMESPACE)_metadata.fbs data.fea $(STILTS_JAR)
 	rm -rf fbs/jarrow
 
 
