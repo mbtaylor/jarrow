@@ -15,6 +15,7 @@ import uk.ac.starlink.table.DefaultValueInfo;
 import uk.ac.starlink.table.DescribedValue;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.Tables;
+import uk.ac.starlink.table.ValueInfo;
 
 public class FeatherStarTable extends AbstractStarTable {
 
@@ -32,6 +33,9 @@ public class FeatherStarTable extends AbstractStarTable {
     public static final String DESCRIPTION_KEY = "description";
     public static final String SHAPE_KEY = "shape";
     public static final String META_KEY = "meta";
+    public static final ValueInfo FTYPE_INFO =
+        new DefaultValueInfo( "feather_type", String.class,
+                              "Data type code from Feather format input file" );
 
     public FeatherStarTable( FeatherTable ftable ) {
         ftable_ = ftable;
@@ -42,7 +46,7 @@ public class FeatherStarTable extends AbstractStarTable {
         colInfos_ = new ColumnInfo[ ncol_ ];
         for ( int icol = 0; icol < ncol_; icol++ ) {
             fcols_[ icol ] = ftable.getColumn( icol );
-            colInfos_[ icol ] = getColumnInfo( fcols_[ icol ] );
+            colInfos_[ icol ] = createColumnInfo( fcols_[ icol ] );
         }
         randomReader_ = new RowReader();
     }
@@ -113,8 +117,9 @@ public class FeatherStarTable extends AbstractStarTable {
         };
     }
 
-    private static ColumnInfo getColumnInfo( FeatherColumn fcol ) {
+    private static ColumnInfo createColumnInfo( FeatherColumn fcol ) {
         Class<?> clazz = fcol.getValueClass();
+        byte ftype = fcol.getFeatherType();
         ColumnInfo info = new ColumnInfo( fcol.getName(), clazz, null );
         info.setNullable( fcol.getNullCount() > 0 );
         Map<String,String> metaMap = getMetaMap( fcol.getUserMeta() );
@@ -137,8 +142,10 @@ public class FeatherStarTable extends AbstractStarTable {
                 info.setShape( DefaultValueInfo.unformatShape( value ) );
             }
         }
-        if ( fcol.getFeatherType() == Type.UINT8 &&
-             clazz.equals( Short.class ) ) {
+        info.setAuxDatum( new DescribedValue( FTYPE_INFO,
+                                              fcol.getFeatherTypeName()
+                                            + "(" + ftype + ")" ) );
+        if ( ftype == Type.UINT8 && clazz.equals( Short.class ) ) {
             info.setAuxDatum( new DescribedValue( Tables.UBYTE_FLAG_INFO,
                                                   Boolean.TRUE ) );
         }

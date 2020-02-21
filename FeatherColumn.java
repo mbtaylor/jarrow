@@ -39,6 +39,10 @@ public class FeatherColumn {
         return featherType_;
     }
 
+    public String getFeatherTypeName() {
+        return decoder_.toString();
+    }
+
     public long getRowCount() {
         return nrow_;
     }
