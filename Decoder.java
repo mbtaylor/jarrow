@@ -1,13 +1,6 @@
 package jarrow.feather;
 
 import jarrow.fbs.Type;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -25,7 +18,7 @@ public abstract class Decoder<T> {
         name_ = name;
     }
 
-    public abstract Reader<T> createReader( ByteBuffer buf, long nrow );
+    public abstract Reader<T> createReader( Buf buf, long nrow );
 
     public Class<T> getValueClass() {
         return clazz_;
@@ -54,11 +47,10 @@ public abstract class Decoder<T> {
     private static Decoder<?>[] createTypeDecoders() {
         Decoder<?>[] decoders = new Decoder<?>[ 19 ];
         decoders[ Type.BOOL ] = new Decoder<Boolean>( Boolean.class, "BOOL" ) {
-            public Reader<Boolean> createReader( final ByteBuffer bbuf,
-                                                 long nrow ) {
+            public Reader<Boolean> createReader( final Buf buf, long nrow ) {
                 return new AbstractReader<Boolean>( Boolean.class ) {
                     private boolean get( long ix ) {
-                        return BufUtils.isBitSet( bbuf, ix );
+                        return buf.isBitSet( ix );
                     }
                     public Boolean getObject( long ix ) {
                         return Boolean.valueOf( get( ix ) );
@@ -85,11 +77,10 @@ public abstract class Decoder<T> {
             };
         };
         decoders[ Type.INT8 ] = new Decoder<Byte>( Byte.class, "INT8" ) {
-            public Reader<Byte> createReader( final ByteBuffer bbuf,
-                                              long nrow ) {
+            public Reader<Byte> createReader( final Buf buf, long nrow ) {
                 return new AbstractReader<Byte>( Byte.class ) {
                     private byte get( long ix ) {
-                        return bbuf.get( BufUtils.longToInt( ix ) );
+                        return buf.get( ix );
                     }
                     public Byte getObject( long ix ) {
                         return Byte.valueOf( get( ix ) );
@@ -116,76 +107,67 @@ public abstract class Decoder<T> {
             }
         };
         decoders[ Type.INT16 ] = new Decoder<Short>( Short.class, "INT16" ) {
-            public Reader<Short> createReader( ByteBuffer bbuf, long nrow ) {
-                final ShortBuffer sbuf = bbuf.asShortBuffer();
+            public Reader<Short> createReader( final Buf buf, long nrow ) {
                 return new ShortReader() {
                     short get( long ix ) {
-                        return sbuf.get( BufUtils.longToInt( ix ) );
+                        return buf.getShort( 2 * ix );
                     }
                 };
             }
         };
         decoders[ Type.INT32 ] =
                 new Decoder<Integer>( Integer.class, "INT32" ) {
-            public Reader<Integer> createReader( ByteBuffer bbuf, long nrow ) {
-                final IntBuffer ibuf = bbuf.asIntBuffer();
+            public Reader<Integer> createReader( final Buf buf, long nrow ) {
                 return new IntReader() {
                     int get( long ix ) {
-                        return ibuf.get( BufUtils.longToInt( ix ) );
+                        return buf.getInt( 4 * ix );
                     }
                 };
             }
         };
         decoders[ Type.INT64 ] = new Decoder<Long>( Long.class, "INT64" ) {
-            public Reader<Long> createReader( ByteBuffer bbuf, long nrow ) {
-                final LongBuffer lbuf = bbuf.asLongBuffer();
+            public Reader<Long> createReader( final Buf buf, long nrow ) {
                 return new LongReader() {
                     long get( long ix ) {
-                        return lbuf.get( BufUtils.longToInt( ix ) );
+                        return buf.getLong( 8 * ix );
                     }
                 };
             }
         };
         decoders[ Type.UINT8 ] = new Decoder<Short>( Short.class, "UINT8" ) {
-            public Reader<Short> createReader( final ByteBuffer bbuf,
-                                               long nrow ) {
+            public Reader<Short> createReader( final Buf buf, long nrow ) {
                 return new ShortReader() {
                     short get( long ix ) {
-                        return (short)
-                               ( 0xff & bbuf.get( BufUtils.longToInt( ix ) ) );
+                        return (short) ( 0xff & buf.get( ix ) );
                     }
                 };
             }
         };
         decoders[ Type.UINT16 ] =
                 new Decoder<Integer>( Integer.class, "UINT16" ) {
-            public Reader<Integer> createReader( ByteBuffer bbuf, long nrow ) {
-                final ShortBuffer sbuf = bbuf.asShortBuffer();
+            public Reader<Integer> createReader( final Buf buf, long nrow ) {
                 return new IntReader() {
                     int get( long ix ) {
-                        return 0xffff & sbuf.get( BufUtils.longToInt( ix ) );
+                        return 0xffff & buf.getShort( 2 * ix );
                     }
                 };
             }
         };
         decoders[ Type.UINT32 ] = new Decoder<Long>( Long.class, "UINT32" ) {
-            public Reader<Long> createReader( ByteBuffer bbuf, long nrow ) {
-                final IntBuffer ibuf = bbuf.asIntBuffer();
+            public Reader<Long> createReader( final Buf buf, long nrow ) {
                 return new LongReader() {
                     long get( long ix ) {
-                        return 0xffffffffL
-                             & ibuf.get( BufUtils.longToInt( ix ) );
+                        return 0xffffffffL & buf.getInt( 4 * ix );
                     }
                 };
             }
         };
         decoders[ Type.UINT64 ] = new UnsupportedDecoder( "UINT64" );
         decoders[ Type.FLOAT ] = new Decoder<Float>( Float.class, "FLOAT" ) {
-            public Reader<Float> createReader( ByteBuffer bbuf, long nrow ) {
-                final FloatBuffer fbuf = bbuf.asFloatBuffer();
+            public Reader<Float> createReader( final Buf buf, long nrow ) {
                 return new AbstractReader<Float>( Float.class ) {
                     private float get( long ix ) {
-                        return fbuf.get( BufUtils.longToInt( ix ) );
+                        return buf.getFloat( 4 * ix );
                     }
                     public Float getObject( long ix ) {
                         return Float.valueOf( get( ix ) );
@@ -213,11 +195,10 @@ public abstract class Decoder<T> {
         };
         decoders[ Type.DOUBLE ] =
                 new Decoder<Double>( Double.class, "DOUBLE" ) {
-            public Reader<Double> createReader( ByteBuffer bbuf, long nrow ) {
-                final DoubleBuffer dbuf = bbuf.asDoubleBuffer();
+            public Reader<Double> createReader( final Buf buf, long nrow ) {
                 return new AbstractReader<Double>( Double.class ) {
                     private double get( long ix ) {
-                        return dbuf.get( BufUtils.longToInt( ix ) );
+                        return buf.getDouble( 8 * ix );
                     }
                     public Double getObject( long ix ) {
                         return Double.valueOf( get( ix ) );
@@ -244,10 +225,9 @@ public abstract class Decoder<T> {
             }
         };
         decoders[ Type.UTF8 ] = new Decoder<String>( String.class, "UTF8" ) {
-            public Reader<String> createReader( final ByteBuffer bbuf,
-                                                long nrow ) {
+            public Reader<String> createReader( Buf buf, long nrow ) {
                 return new VariableLengthReader32<String>( String.class,
-                                                           bbuf, nrow ) {
+                                                           buf, nrow ) {
                     public String getObject( long ix ) {
                         return new String( getBytes( ix ), BufUtils.UTF8 );
                     }
@@ -256,10 +236,9 @@ public abstract class Decoder<T> {
         };
         decoders[ Type.BINARY ] =
                 new Decoder<byte[]>( byte[].class, "BINARY" ) {
-            public Reader<byte[]> createReader( final ByteBuffer bbuf,
-                                                long nrow ) {
+            public Reader<byte[]> createReader( Buf buf, long nrow ) {
                 return new VariableLengthReader32<byte[]>( byte[].class,
-                                                           bbuf, nrow ) {
+                                                           buf, nrow ) {
                     public byte[] getObject( long ix ) {
                         return getBytes( ix );
                     }
@@ -268,10 +247,9 @@ public abstract class Decoder<T> {
         };
         decoders[ Type.LARGE_UTF8 ] =
                 new Decoder<String>( String.class, "LARGE_UTF8" ) {
-            public Reader<String> createReader( final ByteBuffer bbuf,
-                                                long nrow ) {
+            public Reader<String> createReader( Buf buf, long nrow ) {
                 return new VariableLengthReader64<String>( String.class,
-                                                           bbuf, nrow ) {
+                                                           buf, nrow ) {
                     public String getObject( long ix ) {
                         return new String( getBytes( ix ), BufUtils.UTF8 );
                     }
@@ -280,10 +258,9 @@ public abstract class Decoder<T> {
         };
         decoders[ Type.LARGE_BINARY ] =
                 new Decoder<byte[]>( byte[].class, "LARGE_BINARY" ) {
-            public Reader<byte[]> createReader( final ByteBuffer bbuf,
-                                                long nrow ) {
+            public Reader<byte[]> createReader( Buf buf, long nrow ) {
                 return new VariableLengthReader64<byte[]>( byte[].class,
-                                                           bbuf, nrow ) {
+                                                           buf, nrow ) {
                     public byte[] getObject( long ix ) {
                         return getBytes( ix );
                     }
@@ -297,31 +274,28 @@ public abstract class Decoder<T> {
         decoders[ Type.CATEGORY ] = new UnsupportedDecoder( "CATEGORY" );
         decoders[ Type.TIMESTAMP ] =
                 new Decoder<Long>( Long.class, "TIMESTAMP" ) {
-            public Reader<Long> createReader( ByteBuffer bbuf, long nrow ) {
-                final LongBuffer lbuf = bbuf.asLongBuffer();
+            public Reader<Long> createReader( Buf buf, long nrow ) {
                 return new LongReader() {
                     long get( long ix ) {
-                        return lbuf.get( BufUtils.longToInt( ix ) );
+                        return buf.getLong( 8 * ix );
                     }
                 };
             }
         };
         decoders[ Type.DATE ] = new Decoder<Integer>( Integer.class, "DATE" ) {
-            public Reader<Integer> createReader( ByteBuffer bbuf, long nrow ) {
-                final IntBuffer ibuf = bbuf.asIntBuffer();
+            public Reader<Integer> createReader( final Buf buf, long nrow ) {
                 return new IntReader() {
                     int get( long ix ) {
-                        return ibuf.get( BufUtils.longToInt( ix ) );
+                        return buf.getInt( 4 * ix );
                     }
                 };
             }
         };
         decoders[ Type.TIME ] = new Decoder<Long>( Long.class, "TIME" ) {
-            public Reader<Long> createReader( ByteBuffer bbuf, long nrow ) {
-                final LongBuffer lbuf = bbuf.asLongBuffer();
+            public Reader<Long> createReader( final Buf buf, long nrow ) {
                 return new LongReader() {
                     long get( long ix ) {
-                        return lbuf.get( BufUtils.longToInt( ix ) );
+                        return buf.getLong( 8 * ix );
                     }
                 };
             }
@@ -452,44 +426,42 @@ public abstract class Decoder<T> {
     private static abstract class VariableLengthReader32<T>
             extends NonNumericReader<T> {
         private static final int OFFSET_SIZE = 4;
-        private final ByteBuffer bbuf_;
+        private final Buf buf_;
         private final long data0_;
-        VariableLengthReader32( Class<T> clazz, ByteBuffer bbuf, long nrow ) {
+        VariableLengthReader32( Class<T> clazz, Buf buf, long nrow ) {
             super( clazz );
-            bbuf_ = bbuf;
+            buf_ = buf;
             data0_ = BufUtils.ceil8( ( nrow + 1 ) * OFFSET_SIZE );
         }
         byte[] getBytes( long ix ) {
-            int ioff1 = BufUtils.longToInt( ( ix + 1 ) * OFFSET_SIZE );
-            int doff0 = bbuf_.getInt( ioff1 - OFFSET_SIZE );
-            int doff1 = bbuf_.getInt( ioff1 );
-            int leng = doff1 - doff0;
-            byte[] dbuf = new byte[ leng ];
-            bbuf_.position( BufUtils.longToInt( data0_ + doff0 ) );
-            bbuf_.get( dbuf );
-            return dbuf;
+            long ioff0 = ix * OFFSET_SIZE;
+            long doff0 = buf_.getInt( ioff0 );
+            long doff1 = buf_.getInt( ioff0 + OFFSET_SIZE );
+            int leng = (int) Math.min( doff1 - doff0, Integer.MAX_VALUE );
+            byte[] dbytes = new byte[ leng ];
+            buf_.get( data0_ + doff0, dbytes );
+            return dbytes;
         }
     }
 
     private static abstract class VariableLengthReader64<T>
             extends NonNumericReader<T> {
         private static final int OFFSET_SIZE = 8;
-        private final ByteBuffer bbuf_;
+        private final Buf buf_;
         private final long data0_;
-        VariableLengthReader64( Class<T> clazz, ByteBuffer bbuf, long nrow ) {
+        VariableLengthReader64( Class<T> clazz, Buf buf, long nrow ) {
             super( clazz );
-            bbuf_ = bbuf;
+            buf_ = buf;
             data0_ = BufUtils.ceil8( ( nrow + 1 ) * OFFSET_SIZE );
         }
         byte[] getBytes( long ix ) {
-            int ioff1 = BufUtils.longToInt( ( ix + 1 ) * OFFSET_SIZE );
-            long doff0 = bbuf_.getLong( ioff1 - OFFSET_SIZE );
-            long doff1 = bbuf_.getLong( ioff1 );
-            int leng = BufUtils.longToInt( doff1 - doff0 );
-            byte[] dbuf = new byte[ leng ];
-            bbuf_.position( BufUtils.longToInt( data0_ + doff0 ) );
-            bbuf_.get( dbuf );
-            return dbuf;
+            long ioff0 = ix * OFFSET_SIZE;
+            long doff0 = buf_.getLong( ioff0 );
+            long doff1 = buf_.getLong( ioff0 + OFFSET_SIZE );
+            int leng = (int) Math.min( doff1 - doff0, Integer.MAX_VALUE );
+            byte[] dbytes = new byte[ leng ];
+            buf_.get( data0_ + doff0, dbytes );
+            return dbytes;
         }
     }
 
@@ -503,7 +475,7 @@ public abstract class Decoder<T> {
                 }
             };
         }
-        public Reader<Void> createReader( ByteBuffer buf, long nrow ) {
+        public Reader<Void> createReader( Buf buf, long nrow ) {
             return dummyReader_;
         }
     }

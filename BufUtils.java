@@ -3,7 +3,6 @@ package jarrow.feather;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
@@ -22,11 +21,6 @@ public class BufUtils {
         else {
             throw new RuntimeException( "Integer overflow!" );
         }
-    }
-
-    public static boolean isBitSet( ByteBuffer bbuf, long ix ) {
-        return ( bbuf.get( longToInt( ix / 8 ) )
-               & ( 1 << ((int) ix) % 8 ) ) != 0;
     }
 
     public static int readLittleEndianInt( RandomAccessFile raf )

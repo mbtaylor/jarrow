@@ -2,8 +2,6 @@ package jarrow.feather;
 
 import jarrow.fbs.Column;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 public class FeatherColumn {
 
@@ -57,19 +55,14 @@ public class FeatherColumn {
 
     public Reader<?> createReader() throws IOException {
         if ( nNull_ == 0 ) {
-            ByteBuffer bbuf =
-                mapper_.mapBuffer().order( ByteOrder.LITTLE_ENDIAN );
-            return decoder_.createReader( bbuf, nrow_ );
+            return decoder_.createReader( mapper_.mapBuffer(), nrow_ );
         }
         else {
             // The Feather docs say this is byte aligned, but it looks like
             // it's aligned on 64-bit boundaries.
-            int dataOffset = BufUtils.longToInt( ( ( nrow_ + 63 ) / 64 ) * 8 );
-            ByteBuffer maskBuf =
-                mapper_.mapBuffer().order( ByteOrder.LITTLE_ENDIAN );
-            ByteBuffer dataBuf =
-                mapper_.mapBuffer( dataOffset )
-                       .order( ByteOrder.LITTLE_ENDIAN );
+            long dataOffset = ( ( nrow_ + 63 ) / 64 ) * 8;
+            Buf maskBuf = mapper_.mapBuffer();
+            Buf dataBuf = mapper_.mapBuffer( dataOffset );
             return createMaskReader( decoder_.createReader( dataBuf, nrow_ ),
                                      maskBuf );
         }
@@ -96,10 +89,10 @@ public class FeatherColumn {
     }
 
     private static <T> Reader<T> createMaskReader( final Reader<T> basicReader,
-                                                   final ByteBuffer maskBuf ) {
+                                                   final Buf maskBuf ) {
         return new Reader<T>() {
             private boolean isMask( long ix ) {
-                return BufUtils.isBitSet( maskBuf, ix );
+                return maskBuf.isBitSet( ix );
             }
             public T getObject( long ix ) {
                 return isMask( ix ) ? basicReader.getObject( ix ) : null;

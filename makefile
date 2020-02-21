@@ -30,6 +30,9 @@ JSRC = \
        VariableLengthWriter.java \
 
 STIL_JSRC = \
+       Buf.java \
+       BufferAccess.java \
+       \
        FeatherStarTable.java \
        FeatherStarTableWriter.java \
        FeatherTableBuilder.java \

@@ -71,13 +71,11 @@ public class FeatherStarTable extends AbstractStarTable {
         return colInfos_[ icol ];
     }
 
-    public synchronized Object getCell( long irow, int icol )
-            throws IOException {
+    public Object getCell( long irow, int icol ) throws IOException {
         return randomReader_.getCell( irow, icol );
     }
 
-    public synchronized Object getRow( long irow, int icol )
-            throws IOException {
+    public Object getRow( long irow, int icol ) throws IOException {
         return randomReader_.getRow( irow );
     }
 
