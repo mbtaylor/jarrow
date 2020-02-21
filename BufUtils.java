@@ -89,6 +89,13 @@ public class BufUtils {
         return pad;
     }
 
+    /**
+     * @param  nb  positive
+     */
+    public static long ceil8( long nb ) {
+        return ( ( nb + 7 ) / 8 ) * 8;
+    }
+
     public static byte[] marker8( byte value ) {
         byte[] buf = new byte[ 8 ];
         Arrays.fill( buf, value );

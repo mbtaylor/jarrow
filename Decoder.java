@@ -52,7 +52,7 @@ public abstract class Decoder<T> {
     }
 
     private static Decoder<?>[] createTypeDecoders() {
-        Decoder<?>[] decoders = new Decoder<?>[ 17 ];
+        Decoder<?>[] decoders = new Decoder<?>[ 19 ];
         decoders[ Type.BOOL ] = new Decoder<Boolean>( Boolean.class, "BOOL" ) {
             public Reader<Boolean> createReader( final ByteBuffer bbuf,
                                                  long nrow ) {
@@ -246,8 +246,8 @@ public abstract class Decoder<T> {
         decoders[ Type.UTF8 ] = new Decoder<String>( String.class, "UTF8" ) {
             public Reader<String> createReader( final ByteBuffer bbuf,
                                                 long nrow ) {
-                return new VariableLengthReader<String>( String.class,
-                                                         bbuf, nrow ) {
+                return new VariableLengthReader32<String>( String.class,
+                                                           bbuf, nrow ) {
                     public String getObject( long ix ) {
                         return new String( getBytes( ix ), BufUtils.UTF8 );
                     }
@@ -258,14 +258,39 @@ public abstract class Decoder<T> {
                 new Decoder<byte[]>( byte[].class, "BINARY" ) {
             public Reader<byte[]> createReader( final ByteBuffer bbuf,
                                                 long nrow ) {
-                return new VariableLengthReader<byte[]>( byte[].class,
-                                                         bbuf, nrow ) {
+                return new VariableLengthReader32<byte[]>( byte[].class,
+                                                           bbuf, nrow ) {
                     public byte[] getObject( long ix ) {
                         return getBytes( ix );
                     }
                 };
             }
         };
+        decoders[ Type.LARGE_UTF8 ] =
+                new Decoder<String>( String.class, "LARGE_UTF8" ) {
+            public Reader<String> createReader( final ByteBuffer bbuf,
+                                                long nrow ) {
+                return new VariableLengthReader64<String>( String.class,
+                                                           bbuf, nrow ) {
+                    public String getObject( long ix ) {
+                        return new String( getBytes( ix ), BufUtils.UTF8 );
+                    }
+                };
+            }
+        };
+        decoders[ Type.LARGE_BINARY ] =
+                new Decoder<byte[]>( byte[].class, "LARGE_BINARY" ) {
+            public Reader<byte[]> createReader( final ByteBuffer bbuf,
+                                                long nrow ) {
+                return new VariableLengthReader64<byte[]>( byte[].class,
+                                                           bbuf, nrow ) {
+                    public byte[] getObject( long ix ) {
+                        return getBytes( ix );
+                    }
+                };
+            }
+        };
+
         /* I could do this, but (1) I don't know if there are any instances
          * of this data type in feather files out there and (2) it's not
          * clear to me how to interpret the feather format documentation. */
@@ -424,21 +449,43 @@ public abstract class Decoder<T> {
         }
     }
 
-    private static abstract class VariableLengthReader<T>
+    private static abstract class VariableLengthReader32<T>
             extends NonNumericReader<T> {
         private static final int OFFSET_SIZE = 4;
         private final ByteBuffer bbuf_;
         private final long data0_;
-        VariableLengthReader( Class<T> clazz, ByteBuffer bbuf, long nrow ) {
+        VariableLengthReader32( Class<T> clazz, ByteBuffer bbuf, long nrow ) {
             super( clazz );
             bbuf_ = bbuf;
-            data0_ = ( ( ( nrow + 1 ) * OFFSET_SIZE + 7 ) / 8 ) * 8;
+            data0_ = BufUtils.ceil8( ( nrow + 1 ) * OFFSET_SIZE );
         }
         byte[] getBytes( long ix ) {
             int ioff1 = BufUtils.longToInt( ( ix + 1 ) * OFFSET_SIZE );
             int doff0 = bbuf_.getInt( ioff1 - OFFSET_SIZE );
             int doff1 = bbuf_.getInt( ioff1 );
             int leng = doff1 - doff0;
+            byte[] dbuf = new byte[ leng ];
+            bbuf_.position( BufUtils.longToInt( data0_ + doff0 ) );
+            bbuf_.get( dbuf );
+            return dbuf;
+        }
+    }
+
+    private static abstract class VariableLengthReader64<T>
+            extends NonNumericReader<T> {
+        private static final int OFFSET_SIZE = 8;
+        private final ByteBuffer bbuf_;
+        private final long data0_;
+        VariableLengthReader64( Class<T> clazz, ByteBuffer bbuf, long nrow ) {
+            super( clazz );
+            bbuf_ = bbuf;
+            data0_ = BufUtils.ceil8( ( nrow + 1 ) * OFFSET_SIZE );
+        }
+        byte[] getBytes( long ix ) {
+            int ioff1 = BufUtils.longToInt( ( ix + 1 ) * OFFSET_SIZE );
+            long doff0 = bbuf_.getLong( ioff1 - OFFSET_SIZE );
+            long doff1 = bbuf_.getLong( ioff1 );
+            int leng = BufUtils.longToInt( doff1 - doff0 );
             byte[] dbuf = new byte[ leng ];
             bbuf_.position( BufUtils.longToInt( data0_ + doff0 ) );
             bbuf_.get( dbuf );
