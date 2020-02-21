@@ -30,12 +30,15 @@ JSRC = \
        VariableLengthWriter.java \
 
 STIL_JSRC = \
-       EncoderColumnWriter.java \
-       FeatherEncoder.java \
-       FeatherEncoders.java \
        FeatherStarTable.java \
        FeatherStarTableWriter.java \
        FeatherTableBuilder.java \
+       \
+       BooleanStarColumnWriter.java \
+       NumberStarColumnWriter.java \
+       StarColumnWriter.java \
+       StarColumnWriters.java \
+       VariableStarColumnWriter.java \
 
 FBSRC = \
        fbs/com/google/flatbuffers/ByteBufferUtil.java \
@@ -102,6 +105,12 @@ data.fea: data.py
 
 big.fea: big.py
 	$(PYTHON) big.py
+
+tostarjava: $(JARFILE)
+	for d in /mbt/starjava/source/ttools/src/lib/ \
+                 /mbt/starjava/source/ttools/lib/ttools/ \
+                 /mbt/starjava/lib/ttools/; \
+        do cp $(JARFILE) $$d; done
 
 $(STIL_JAR):
 	curl -OL http://www.starlink.ac.uk/stil/stil.jar

@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StreamStarTableWriter;
 import uk.ac.starlink.table.Tables;
@@ -42,21 +41,14 @@ public class FeatherStarTableWriter extends StreamStarTableWriter {
         int ncol = table.getColumnCount();
         List<FeatherColumnWriter> fcwList = new ArrayList<>();
         for ( int ic = 0; ic < ncol; ic++ ) {
-            ColumnInfo colInfo = table.getColumnInfo( ic );
-            Class<?> clazz = colInfo.getContentClass();
-            boolean isUbyte =
-                clazz.equals( Short.class ) &&
-                Boolean.TRUE
-               .equals( colInfo.getAuxDatumValue( Tables.UBYTE_FLAG_INFO,
-                                                  Boolean.class ) );
-            FeatherEncoder encoder =
-                isUbyte ? FeatherEncoders.getUbyteEncoder()
-                        : FeatherEncoders.getEncoder( clazz );
-            if ( encoder != null ) {
-                fcwList.add( new EncoderColumnWriter( table, ic, encoder ) );
+            FeatherColumnWriter writer =
+                StarColumnWriters.createColumnWriter( table, ic );
+            if ( writer != null ) {
+                fcwList.add( writer );
             }
             else {
-                logger_.warning( "Can't encode column " + colInfo + " to "
+                logger_.warning( "Can't encode column "
+                               + table.getColumnInfo( ic ) + " to "
                                + getFormatName() + " format" );
             }
         }
