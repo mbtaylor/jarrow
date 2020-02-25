@@ -12,8 +12,11 @@ import uk.ac.starlink.table.Tables;
 
 public class StarColumnWriters {
 
+    public static final VariableStarColumnWriter.PointerSize VAR_POINTER_SIZE =
+        VariableStarColumnWriter.PointerSize.I64;
     private static final byte[] FLOAT_NAN;
     private static final byte[] DOUBLE_NAN;
+
     static {
         ByteArrayOutputStream dout = new ByteArrayOutputStream( 8 );
         ByteArrayOutputStream fout = new ByteArrayOutputStream( 4 );
@@ -107,16 +110,12 @@ public class StarColumnWriters {
             return new BooleanStarColumnWriter( table, icol );
         }
         else if ( clazz == String.class ) {
-            VariableStarColumnWriter.PointerSize psize =
-                VariableStarColumnWriter.PointerSize.I32;
             return VariableStarColumnWriter
-                  .createStringWriter( table, icol, false, psize );
+                  .createStringWriter( table, icol, false, VAR_POINTER_SIZE );
         }
         else if ( clazz == byte[].class ) {
-            VariableStarColumnWriter.PointerSize psize =
-                VariableStarColumnWriter.PointerSize.I32;
             return VariableStarColumnWriter
-                  .createByteArrayWriter( table, icol, true, psize );
+                  .createByteArrayWriter( table, icol, true, VAR_POINTER_SIZE );
         }
         else {
             return null;
