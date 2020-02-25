@@ -1,6 +1,6 @@
 package uk.ac.starlink.feather;
 
-import jarrow.fbs.Type;
+import jarrow.fbs.feather.Type;
 import jarrow.feather.FeatherColumn;
 import jarrow.feather.FeatherTable;
 import jarrow.feather.Reader;

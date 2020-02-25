@@ -1,8 +1,8 @@
 package jarrow.feather;
 
-import jarrow.fbs.CTable;
-import jarrow.fbs.Column;
-import jarrow.fbs.PrimitiveArray;
+import jarrow.fbs.feather.CTable;
+import jarrow.fbs.feather.Column;
+import jarrow.fbs.feather.PrimitiveArray;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;

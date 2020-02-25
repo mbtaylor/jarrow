@@ -52,17 +52,17 @@ FBSRC = \
        fbs/com/google/flatbuffers/Utf8.java \
        fbs/com/google/flatbuffers/Utf8Old.java \
        fbs/com/google/flatbuffers/Utf8Safe.java \
-       fbs/jarrow/fbs/CategoryMetadata.java \
-       fbs/jarrow/fbs/Column.java \
-       fbs/jarrow/fbs/CTable.java \
-       fbs/jarrow/fbs/DateMetadata.java \
-       fbs/jarrow/fbs/Encoding.java \
-       fbs/jarrow/fbs/PrimitiveArray.java \
-       fbs/jarrow/fbs/TimeMetadata.java \
-       fbs/jarrow/fbs/TimestampMetadata.java \
-       fbs/jarrow/fbs/TimeUnit.java \
-       fbs/jarrow/fbs/Type.java \
-       fbs/jarrow/fbs/TypeMetadata.java \
+       fbs/jarrow/fbs/feather/CategoryMetadata.java \
+       fbs/jarrow/fbs/feather/Column.java \
+       fbs/jarrow/fbs/feather/CTable.java \
+       fbs/jarrow/fbs/feather/DateMetadata.java \
+       fbs/jarrow/fbs/feather/Encoding.java \
+       fbs/jarrow/fbs/feather/PrimitiveArray.java \
+       fbs/jarrow/fbs/feather/TimeMetadata.java \
+       fbs/jarrow/fbs/feather/TimestampMetadata.java \
+       fbs/jarrow/fbs/feather/TimeUnit.java \
+       fbs/jarrow/fbs/feather/Type.java \
+       fbs/jarrow/fbs/feather/TypeMetadata.java \
 
 build: $(JARFILE) javadocs data.fea
 

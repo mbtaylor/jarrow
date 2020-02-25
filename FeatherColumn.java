@@ -1,6 +1,6 @@
 package jarrow.feather;
 
-import jarrow.fbs.Column;
+import jarrow.fbs.feather.Column;
 import java.io.IOException;
 
 public class FeatherColumn {

@@ -1,6 +1,6 @@
 package jarrow.feather;
 
-import jarrow.fbs.Type;
+import jarrow.fbs.feather.Type;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Logger;

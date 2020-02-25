@@ -1,6 +1,6 @@
 package uk.ac.starlink.feather;
 
-import jarrow.fbs.Type;
+import jarrow.fbs.feather.Type;
 import java.io.IOException;
 import java.io.OutputStream;
 import uk.ac.starlink.table.RowSequence;
