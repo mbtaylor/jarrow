@@ -63,6 +63,56 @@ FBSRC = \
        fbs/jarrow/fbs/feather/TimeUnit.java \
        fbs/jarrow/fbs/feather/Type.java \
        fbs/jarrow/fbs/feather/TypeMetadata.java \
+       \
+       fbs/jarrow/fbs/arrow/Binary.java \
+       fbs/jarrow/fbs/arrow/Block.java \
+       fbs/jarrow/fbs/arrow/Bool.java \
+       fbs/jarrow/fbs/arrow/Buffer.java \
+       fbs/jarrow/fbs/arrow/Date.java \
+       fbs/jarrow/fbs/arrow/DateUnit.java \
+       fbs/jarrow/fbs/arrow/Decimal.java \
+       fbs/jarrow/fbs/arrow/DictionaryBatch.java \
+       fbs/jarrow/fbs/arrow/DictionaryEncoding.java \
+       fbs/jarrow/fbs/arrow/DictionaryKind.java \
+       fbs/jarrow/fbs/arrow/Duration.java \
+       fbs/jarrow/fbs/arrow/Endianness.java \
+       fbs/jarrow/fbs/arrow/Field.java \
+       fbs/jarrow/fbs/arrow/FieldNode.java \
+       fbs/jarrow/fbs/arrow/FixedSizeBinary.java \
+       fbs/jarrow/fbs/arrow/FixedSizeList.java \
+       fbs/jarrow/fbs/arrow/FloatingPoint.java \
+       fbs/jarrow/fbs/arrow/Footer.java \
+       fbs/jarrow/fbs/arrow/Interval.java \
+       fbs/jarrow/fbs/arrow/IntervalUnit.java \
+       fbs/jarrow/fbs/arrow/Int.java \
+       fbs/jarrow/fbs/arrow/KeyValue.java \
+       fbs/jarrow/fbs/arrow/LargeBinary.java \
+       fbs/jarrow/fbs/arrow/LargeList.java \
+       fbs/jarrow/fbs/arrow/LargeUtf8.java \
+       fbs/jarrow/fbs/arrow/List.java \
+       fbs/jarrow/fbs/arrow/Map.java \
+       fbs/jarrow/fbs/arrow/MessageHeader.java \
+       fbs/jarrow/fbs/arrow/Message.java \
+       fbs/jarrow/fbs/arrow/MetadataVersion.java \
+       fbs/jarrow/fbs/arrow/Null.java \
+       fbs/jarrow/fbs/arrow/Precision.java \
+       fbs/jarrow/fbs/arrow/RecordBatch.java \
+       fbs/jarrow/fbs/arrow/Schema.java \
+       fbs/jarrow/fbs/arrow/SparseMatrixCompressedAxis.java \
+       fbs/jarrow/fbs/arrow/SparseMatrixIndexCSX.java \
+       fbs/jarrow/fbs/arrow/SparseTensorIndexCOO.java \
+       fbs/jarrow/fbs/arrow/SparseTensorIndex.java \
+       fbs/jarrow/fbs/arrow/SparseTensor.java \
+       fbs/jarrow/fbs/arrow/Struct_.java \
+       fbs/jarrow/fbs/arrow/TensorDim.java \
+       fbs/jarrow/fbs/arrow/Tensor.java \
+       fbs/jarrow/fbs/arrow/Time.java \
+       fbs/jarrow/fbs/arrow/Timestamp.java \
+       fbs/jarrow/fbs/arrow/TimeUnit.java \
+       fbs/jarrow/fbs/arrow/Type.java \
+       fbs/jarrow/fbs/arrow/Union.java \
+       fbs/jarrow/fbs/arrow/UnionMode.java \
+       fbs/jarrow/fbs/arrow/Utf8.java \
 
 build: $(JARFILE) javadocs data.fea
 
