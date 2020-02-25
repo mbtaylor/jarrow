@@ -1,9 +1,12 @@
 package uk.ac.starlink.feather;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import uk.ac.starlink.table.ByteStore;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
+import uk.ac.starlink.table.StoragePolicy;
 
 public abstract class NumberStarColumnWriter extends StarColumnWriter {
 
@@ -43,5 +46,33 @@ public abstract class NumberStarColumnWriter extends StarColumnWriter {
         }
         long nbyte = nrow * itemSize_;
         return new DataStat( nbyte, nrow );
+    }
+
+    public ItemAccumulator createItemAccumulator( StoragePolicy storage ) {
+        final ByteStore dataStore = storage.makeByteStore();
+        final OutputStream dataOut =
+            new BufferedOutputStream( dataStore.getOutputStream() );
+        return new AbstractItemAccumulator( storage, isNullable() ) {
+            long nbData;
+            public void addDataItem( Object item ) throws IOException {
+                if ( item != null ) {
+                    writeNumber( dataOut, (Number) item );
+                }
+                else {
+                    dataOut.write( blank_ );
+                }
+                nbData += itemSize_;
+            }
+            public long writeDataBytes( OutputStream out ) throws IOException {
+                dataOut.close();
+                dataStore.copy( out );
+                dataStore.close();
+                return nbData;
+            }
+            public void closeData() throws IOException {
+                dataOut.close();
+                dataStore.close();
+            }
+        };
     }
 }

@@ -2,11 +2,14 @@ package uk.ac.starlink.feather;
 
 import jarrow.fbs.feather.Type;
 import jarrow.feather.BufUtils;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Logger;
+import uk.ac.starlink.table.ByteStore;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
+import uk.ac.starlink.table.StoragePolicy;
 
 public abstract class VariableStarColumnWriter extends StarColumnWriter {
 
@@ -22,7 +25,7 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
     }
 
     public abstract int getItemSize( Object item );
-    public abstract void writeItemBytes( OutputStream out, Object item )
+    public abstract int writeItemBytes( OutputStream out, Object item )
             throws IOException;
 
     public DataStat writeDataBytes( OutputStream out ) throws IOException {
@@ -57,6 +60,57 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         long nbyte = indexBytes + dataBytes;
         long nrow = ixStat.rowCount_;
         return new DataStat( nbyte, nrow );
+    }
+
+    public ItemAccumulator createItemAccumulator( StoragePolicy storage ) {
+        final ByteStore indexStore = storage.makeByteStore();
+        final ByteStore dataStore = storage.makeByteStore();
+        final OutputStream indexOut =
+            new BufferedOutputStream( indexStore.getOutputStream() );
+        final OutputStream dataOut =
+            new BufferedOutputStream( dataStore.getOutputStream() );
+        return new AbstractItemAccumulator( storage, isNullable() ) {
+            long ioff;
+            boolean hasOverflowed;
+            long nrow;
+            public void addDataItem( Object item ) throws IOException {
+                nrow++;
+                psize_.writeOffset( indexOut, ioff );
+                long ioff1 = ioff + writeItemBytes( dataOut, item );
+                if ( ! psize_.isOverflow( ioff1 ) ) {
+                    ioff = ioff1;
+                }
+                else {
+                    if ( ! hasOverflowed ) {
+                        hasOverflowed = true;
+                        logger_.warning( "Pointer overflow - "
+                                       + "empty values in column "
+                                       + getTable()
+                                        .getColumnInfo( getColumnIndex() )
+                                        .getName()
+                                       + " past row " + nrow );
+                    }
+                }
+            }
+            public long writeDataBytes( OutputStream out ) throws IOException {
+                psize_.writeOffset( indexOut, ioff );
+                long ixb = psize_.nbyte_ * ( nrow + 1 );
+                long indexBytes = ixb + BufUtils.align8( indexOut, ixb );
+                indexOut.close();
+                indexStore.copy( out );
+                indexStore.close();
+                dataOut.close();
+                dataStore.copy( out );
+                dataStore.close();
+                return indexBytes + ioff;
+            }
+            public void closeData() throws IOException {
+                indexOut.close();
+                indexStore.close();
+                dataOut.close();
+                dataStore.close();
+            }
+        };
     }
 
     private IndexStatus writeOffsets( OutputStream out, RowSequence rseq )
@@ -95,10 +149,15 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
                      ? 0
                      : BufUtils.utf8Length( item.toString() );
             }
-            public void writeItemBytes( OutputStream out, Object item )
+            public int writeItemBytes( OutputStream out, Object item )
                     throws IOException {
                 if ( item != null ) {
-                    out.write( item.toString().getBytes( BufUtils.UTF8 ) );
+                    byte[] bytes = item.toString().getBytes( BufUtils.UTF8 );
+                    out.write( bytes );
+                    return bytes.length;
+                }
+                else {
+                    return 0;
                 }
             }
         };
@@ -114,10 +173,15 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
                      ? ((byte[]) item).length
                      : 0;
             }
-            public void writeItemBytes( OutputStream out, Object item )
+            public int writeItemBytes( OutputStream out, Object item )
                     throws IOException {
                 if ( item instanceof byte[] ) {
-                    out.write( (byte[]) item );
+                    byte[] bytes = (byte[]) item;
+                    out.write( bytes );
+                    return bytes.length;
+                }
+                else {
+                    return 0;
                 }
             }
         };

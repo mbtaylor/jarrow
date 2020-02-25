@@ -1,10 +1,13 @@
 package uk.ac.starlink.feather;
 
 import jarrow.fbs.feather.Type;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import uk.ac.starlink.table.ByteStore;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
+import uk.ac.starlink.table.StoragePolicy;
 
 public class BooleanStarColumnWriter extends StarColumnWriter {
 
@@ -39,5 +42,44 @@ public class BooleanStarColumnWriter extends StarColumnWriter {
         }
         long nbyte = ( nrow + 7 ) / 8;
         return new DataStat( nbyte, nrow );
+    }
+
+    public ItemAccumulator createItemAccumulator( StoragePolicy storage ) {
+        final ByteStore dataStore = storage.makeByteStore();
+        final OutputStream dataOut =
+            new BufferedOutputStream( dataStore.getOutputStream() );
+        return new AbstractItemAccumulator( storage, true ) {
+            int mask;
+            int ibit;
+            long nbyte;
+            long nrow;
+            public void addDataItem( Object item ) throws IOException {
+                nrow++;
+                if ( Boolean.TRUE.equals( item ) ) {
+                    mask |= 1 << ibit;
+                }
+                if ( ++ibit == 8 ) {
+                    dataOut.write( mask );
+                    nbyte++;
+                    ibit = 0;
+                    mask = 0;
+                }
+            }
+            public long writeDataBytes( OutputStream out ) throws IOException {
+                if ( ibit > 0 ) {
+                    dataOut.write( mask );
+                    nbyte++;
+                }
+                dataOut.close();
+                dataStore.copy( out );
+                dataStore.close();
+                assert nbyte == ( nrow + 7 ) / 8;
+                return nbyte;
+            }
+            public void closeData() throws IOException {
+                dataOut.close();
+                dataStore.close();
+            }
+        };
     }
 }

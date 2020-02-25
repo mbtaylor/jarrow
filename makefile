@@ -37,7 +37,9 @@ STIL_JSRC = \
        FeatherStarTableWriter.java \
        FeatherTableBuilder.java \
        \
+       AbstractItemAccumulator.java \
        BooleanStarColumnWriter.java \
+       ItemAccumulator.java \
        NumberStarColumnWriter.java \
        StarColumnWriter.java \
        StarColumnWriters.java \

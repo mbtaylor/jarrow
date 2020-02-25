@@ -10,6 +10,7 @@ import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.DefaultValueInfo;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
+import uk.ac.starlink.table.StoragePolicy;
 
 public abstract class StarColumnWriter implements FeatherColumnWriter {
 
@@ -48,6 +49,10 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
 
     public byte getFeatherType() {
         return featherType_;
+    }
+
+    public boolean isNullable() {
+        return isNullable_;
     }
 
     public String getName() {
@@ -134,6 +139,9 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
             }
         };
     }
+
+    public abstract ItemAccumulator
+        createItemAccumulator( StoragePolicy storage );
 
     private static void addEntry( JSONObject json, String key, String value ) {
         if ( value != null && value.trim().length() > 0 ) {
