@@ -3,6 +3,7 @@ package uk.ac.starlink.feather;
 import jarrow.feather.ColStat;
 import jarrow.feather.FeatherColumnWriter;
 import jarrow.feather.FeatherTableWriter;
+import jarrow.feather.FeatherType;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -92,7 +93,7 @@ public class FeatherStarTableWriter extends StreamStarTableWriter {
                 final FeatherColumnWriter cw = cwList.get( jc );
                 final ItemAccumulator acc = accs[ jc ];
                 colWriters[ jc ] = new FeatherColumnWriter() {
-                    public byte getFeatherType() {
+                    public FeatherType getFeatherType() {
                         return cw.getFeatherType();
                     }
                     public String getName() {

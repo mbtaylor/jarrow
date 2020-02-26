@@ -3,6 +3,7 @@ package uk.ac.starlink.feather;
 import jarrow.feather.BufUtils;
 import jarrow.feather.ColStat;
 import jarrow.feather.FeatherColumnWriter;
+import jarrow.feather.FeatherType;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.json.JSONObject;
@@ -16,7 +17,7 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
 
     private final StarTable table_;
     private final int icol_;
-    private final byte featherType_;
+    private final FeatherType featherType_;
     private final boolean isNullable_;
 
     /**
@@ -27,8 +28,8 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
      * @param  isNullable  contains any null values which should be marked
      *                     as such in the null values mask
      */
-    protected StarColumnWriter( StarTable table, int icol, byte featherType,
-                                boolean isNullable ) {
+    protected StarColumnWriter( StarTable table, int icol,
+                                FeatherType featherType, boolean isNullable ) {
         table_ = table;
         icol_ = icol;
         featherType_ = featherType;
@@ -47,7 +48,7 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
         return icol_;
     }
 
-    public byte getFeatherType() {
+    public FeatherType getFeatherType() {
         return featherType_;
     }
 

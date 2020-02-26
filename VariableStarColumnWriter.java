@@ -1,7 +1,7 @@
 package uk.ac.starlink.feather;
 
-import jarrow.fbs.feather.Type;
 import jarrow.feather.BufUtils;
+import jarrow.feather.FeatherType;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,9 +18,9 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         Logger.getLogger( "uk.ac.starlink.feather" );
 
     protected VariableStarColumnWriter( StarTable table, int icol,
-                                        byte featherType, boolean isNullable,
+                                        FeatherType ftype, boolean isNullable,
                                         PointerSize psize ) {
-        super( table, icol, featherType, isNullable );
+        super( table, icol, ftype, isNullable );
         psize_ = psize;
     }
 
@@ -189,7 +189,7 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
 
     public enum PointerSize {
 
-        I32( 4, Type.UTF8, Type.BINARY ) {
+        I32( 4, FeatherType.UTF8, FeatherType.BINARY ) {
             void writeOffset( OutputStream out, long ioff ) throws IOException {
                 BufUtils.writeLittleEndianInt( out, (int) ioff );
             }
@@ -197,7 +197,7 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
                 return ioff >= Integer.MAX_VALUE;
             }
         },
-        I64( 8, Type.LARGE_UTF8, Type.LARGE_BINARY ) {
+        I64( 8, FeatherType.LARGE_UTF8, FeatherType.LARGE_BINARY ) {
             void writeOffset( OutputStream out, long ioff ) throws IOException {
                 BufUtils.writeLittleEndianLong( out, ioff );
             }
@@ -207,10 +207,11 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         };
 
         final int nbyte_;
-        final byte utf8Type_;
-        final byte binaryType_;
+        final FeatherType utf8Type_;
+        final FeatherType binaryType_;
 
-        private PointerSize( int nbyte, byte utf8Type, byte binaryType ) {
+        private PointerSize( int nbyte, FeatherType utf8Type,
+                             FeatherType binaryType ) {
             nbyte_ = nbyte;
             utf8Type_ = utf8Type;
             binaryType_ = binaryType;

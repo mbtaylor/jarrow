@@ -1,8 +1,9 @@
 package uk.ac.starlink.feather;
 
-import jarrow.fbs.feather.Type;
+import jarrow.feather.Decoder;
 import jarrow.feather.FeatherColumn;
 import jarrow.feather.FeatherTable;
+import jarrow.feather.FeatherType;
 import jarrow.feather.Reader;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -116,8 +117,9 @@ public class FeatherStarTable extends AbstractStarTable {
     }
 
     private static ColumnInfo createColumnInfo( FeatherColumn fcol ) {
-        Class<?> clazz = fcol.getValueClass();
-        byte ftype = fcol.getFeatherType();
+        Decoder<?> decoder = fcol.getDecoder();
+        Class<?> clazz = decoder.getValueClass();
+        FeatherType ftype = decoder.getFeatherType();
         ColumnInfo info = new ColumnInfo( fcol.getName(), clazz, null );
         info.setNullable( fcol.getNullCount() > 0 );
         Map<String,String> metaMap = getMetaMap( fcol.getUserMeta() );
@@ -140,10 +142,8 @@ public class FeatherStarTable extends AbstractStarTable {
                 info.setShape( DefaultValueInfo.unformatShape( value ) );
             }
         }
-        info.setAuxDatum( new DescribedValue( FTYPE_INFO,
-                                              fcol.getFeatherTypeName()
-                                            + "(" + ftype + ")" ) );
-        if ( ftype == Type.UINT8 && clazz.equals( Short.class ) ) {
+        info.setAuxDatum( new DescribedValue( FTYPE_INFO, ftype.toString() ) );
+        if ( ftype == FeatherType.UINT8 && clazz.equals( Short.class ) ) {
             info.setAuxDatum( new DescribedValue( Tables.UBYTE_FLAG_INFO,
                                                   Boolean.TRUE ) );
         }

@@ -1,6 +1,6 @@
 package uk.ac.starlink.feather;
 
-import jarrow.fbs.feather.Type;
+import jarrow.feather.FeatherType;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,7 +12,7 @@ import uk.ac.starlink.table.StoragePolicy;
 public class BooleanStarColumnWriter extends StarColumnWriter {
 
     public BooleanStarColumnWriter( StarTable table, int icol ) {
-        super( table, icol, Type.BOOL, true );
+        super( table, icol, FeatherType.BOOL, true );
     }
 
     public DataStat writeDataBytes( OutputStream out ) throws IOException {

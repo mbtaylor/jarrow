@@ -1,5 +1,6 @@
 package uk.ac.starlink.feather;
 
+import jarrow.feather.FeatherType;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,7 +15,7 @@ public abstract class NumberStarColumnWriter extends StarColumnWriter {
     private final int itemSize_;
 
     public NumberStarColumnWriter( StarTable table, int icol,
-                                   byte featherType, boolean isNullable,
+                                   FeatherType featherType, boolean isNullable,
                                    byte[] blank ) {
         super( table, icol, featherType, isNullable );
         blank_ = blank.clone();

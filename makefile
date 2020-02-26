@@ -16,7 +16,9 @@ JARFILE = jarrow.jar
 
 JSRC = \
        AbstractColumnWriter.java \
-       BooleanColumnWriter.java \
+       BooleanRandomWriter.java \
+       Buf.java \
+       BufAccess.java \
        BufMapper.java \
        BufUtils.java \
        ColStat.java \
@@ -25,14 +27,12 @@ JSRC = \
        FeatherColumnWriter.java \
        FeatherTable.java \
        FeatherTableWriter.java \
-       PrimitiveArrayWriter.java \
+       FeatherType.java \
+       NumberRandomWriter.java \
        Reader.java \
-       VariableLengthWriter.java \
+       VariableLengthRandomWriter.java \
 
 STIL_JSRC = \
-       Buf.java \
-       BufferAccess.java \
-       \
        FeatherStarTable.java \
        FeatherStarTableWriter.java \
        FeatherTableBuilder.java \

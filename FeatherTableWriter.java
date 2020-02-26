@@ -8,14 +8,28 @@ import java.io.IOException;
 import java.io.OutputStream;
 import com.google.flatbuffers.FlatBufferBuilder;
 
+/**
+ * Can write table data to a Feather-format file.
+ *
+ * @author   Mark Taylor
+ * @since    26 Feb 2020
+ */
 public class FeatherTableWriter {
 
+    /** Supported version of the Feather format. */
     public static final int FEATHER_VERSION = 1;
 
     private final String description_;
     private final String tableUserMeta_;
     private final FeatherColumnWriter[] colWriters_;
 
+    /**
+     * Constructor.
+     *
+     * @param  description  optional table description string
+     * @param  tableMeta  optional user metadata string, should probably be JSON
+     * @param  colWriters  objects that can write column data
+     */
     public FeatherTableWriter( String description, String tableMeta,
                                FeatherColumnWriter[] colWriters ) {
         description_ = description;
@@ -23,6 +37,11 @@ public class FeatherTableWriter {
         colWriters_ = colWriters;
     }
 
+    /**
+     * Serializes this writer's table to a given output stream.
+     *
+     * @param out  destination stream
+     */
     public void write( OutputStream out ) throws IOException {
         out = new BufferedOutputStream( out );
         long baseOffset = 0;
@@ -44,11 +63,20 @@ public class FeatherTableWriter {
         out.flush();
     }
 
+    /**
+     * Constructs the metadata block for this writer's table
+     * as required by Feather format.
+     *
+     * @param  colStats  details about how the table's columns were
+     *                   serialised
+     * @param  baseOffset  offset of the start of the table data area
+     *                     within the file
+     * @return   metadata block as a byte array
+     */
     private byte[] createMetadataBlock( ColStat[] colStats, long baseOffset ) {
         FlatBufferBuilder builder = new FlatBufferBuilder();
         int descriptionTag = createStringTag( builder, description_ );
         int tableUserMetaTag = createStringTag( builder, tableUserMeta_ );
-
         int nc = colWriters_.length;
         int[] colTags = new int[ nc ];
         long streamOffset = baseOffset;
@@ -66,7 +94,8 @@ public class FeatherTableWriter {
             long nbyte = colStat.getByteCount() - internalOffset;
             streamOffset += colStat.getByteCount();
             PrimitiveArray.startPrimitiveArray( builder );
-            PrimitiveArray.addType( builder, colWriter.getFeatherType() );
+            PrimitiveArray.addType( builder,
+                                    colWriter.getFeatherType().getTypeByte() );
             PrimitiveArray.addOffset( builder, offset );
             PrimitiveArray.addLength( builder, nr );
             PrimitiveArray.addNullCount( builder, nnull );
@@ -83,7 +112,6 @@ public class FeatherTableWriter {
             colTags[ ic ] = Column.endColumn( builder );
         }
         int columnsTag = CTable.createColumnsVector( builder, colTags );
- 
         CTable.startCTable( builder );
         CTable.addVersion( builder, FEATHER_VERSION );
         CTable.addNumRows( builder, nrow );
@@ -92,20 +120,37 @@ public class FeatherTableWriter {
         CTable.addColumns( builder, columnsTag );
         int ctableTag = CTable.endCTable( builder );
         CTable.finishCTableBuffer( builder, ctableTag );
-
         return builder.sizedByteArray();
     }
 
-    private static int createStringTag( FlatBufferBuilder builder, String s ) {
-        return s == null ? 0 : builder.createString( s );
+    /**
+     * Returns a flatbuffer tag for a string that may be null.
+     *
+     * @param  builder  flatbuffer builder
+     * @param  txt   string value, may be null
+     * @return  tag suitable for insersion in flatbuffer
+     */
+    private static int createStringTag( FlatBufferBuilder builder,
+                                        String txt ) {
+        return txt == null ? 0 : builder.createString( txt );
     }
 
+    /**
+     * Writes a little-endian integer and returns the number of bytes written.
+     *
+     * @param  out  destination stream
+     * @param  ivalue  value to write
+     * @return  4
+     */
     private static int writeLittleEndianInt( OutputStream out, int ivalue )
             throws IOException {
         BufUtils.writeLittleEndianInt( out, ivalue );
         return 4;
     }
 
+    /**
+     * Test method.  Writes a short feather table to standard output.
+     */
     public static void main( String[] args ) throws IOException {
         int nrow = args.length > 0 ? Integer.parseInt( args[ 0 ] ) : 5;
         short[] sdata = new short[ nrow ];
@@ -124,12 +169,13 @@ public class FeatherTableWriter {
             tdata[ ir ] = txts[ ir % txts.length ];
         }
         FeatherColumnWriter[] writers = {
-            PrimitiveArrayWriter.createShortWriter( "scol", sdata, null ),
-            PrimitiveArrayWriter.createIntWriter( "icol", idata, "int col" ),
-            PrimitiveArrayWriter.createLongWriter( "lcol", ldata, null ),
-            PrimitiveArrayWriter.createFloatWriter( "fcol", fdata, null ),
-            PrimitiveArrayWriter.createDoubleWriter( "dcol", ddata, null ),
-            VariableLengthWriter.createStringWriter( "tcol", tdata, null, false)
+            NumberRandomWriter.createShortWriter( "scol", sdata, null ),
+            NumberRandomWriter.createIntWriter( "icol", idata, "int col" ),
+            NumberRandomWriter.createLongWriter( "lcol", ldata, null ),
+            NumberRandomWriter.createFloatWriter( "fcol", fdata, null ),
+            NumberRandomWriter.createDoubleWriter( "dcol", ddata, null ),
+            VariableLengthRandomWriter.createStringWriter( "tcol", tdata,
+                                                           null, false ),
         };
         new FeatherTableWriter( "test table", null, writers )
            .write( System.out );

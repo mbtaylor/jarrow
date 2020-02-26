@@ -1,19 +1,36 @@
 package jarrow.feather;
 
-import jarrow.fbs.feather.Type;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Partial FeatherColumnWriter implementation that handles
+ * generic aspects including writing the optional validity mask.
+ *
+ * @author   Mark Taylor
+ * @since    26 Feb 2020
+ */
 public abstract class AbstractColumnWriter implements FeatherColumnWriter {
 
     private final String name_;
-    private final byte featherType_;
+    private final FeatherType featherType_;
     private final long nrow_;
     private final boolean isNullable_;
     private final String userMeta_;
 
-    protected AbstractColumnWriter( String name, byte featherType, long nrow,
-                                    boolean isNullable, String userMeta ) {
+    /**
+     * Constructor.
+     *
+     * @param  name  column name
+     * @param  featherType  column data type
+     * @param  nrow  number of rows
+     * @param  isNullable  whether the column may contain values that need
+     *                     to be flagged as null in the validity mask
+     * @param  userMeta  optional user metadata string, probably should be JSON
+     */
+    protected AbstractColumnWriter( String name, FeatherType featherType,
+                                    long nrow, boolean isNullable,
+                                    String userMeta ) {
         name_ = name;
         featherType_ = featherType;
         nrow_ = nrow;
@@ -25,7 +42,7 @@ public abstract class AbstractColumnWriter implements FeatherColumnWriter {
         return name_;
     }
 
-    public byte getFeatherType() {
+    public FeatherType getFeatherType() {
         return featherType_;
     }
 
@@ -91,10 +108,24 @@ public abstract class AbstractColumnWriter implements FeatherColumnWriter {
         };
     }
 
-    // Only called if isNullable returns true
+    /**
+     * Tests the value at a given row for nullness (whether it needs to be
+     * flagged as null in the validity mask).
+     * This method is only ever called for nullable columns
+     * (if the <code>isNullable</code> flag was set true at construction time).
+     *
+     * @param   irow  row index to test
+     * @return   true iff the value at row irow is to be flagged null
+     */
     public abstract boolean isNull( long irow );
 
-    // Excluding any mask.  Doesn't need to be aligned.
-    // @return   number of bytes written
+    /**
+     * Writes the bytes consituting the data stream for this column,
+     * excluding any optional validity mask.
+     * Note the output does not need to be aligned on an 8-byte boundary.
+     *
+     * @param   out  desitination stream
+     * @return   number of bytes written
+     */
     public abstract long writeDataBytes( OutputStream out ) throws IOException;
 }

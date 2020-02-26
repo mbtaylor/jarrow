@@ -1,7 +1,7 @@
 package uk.ac.starlink.feather;
 
-import jarrow.fbs.feather.Type;
 import jarrow.feather.BufUtils;
+import jarrow.feather.FeatherType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,8 +41,8 @@ public class StarColumnWriters {
         ColumnInfo info = table.getColumnInfo( icol );
         Class<?> clazz = info.getContentClass();
         if ( clazz == Double.class ) {
-            return new NumberStarColumnWriter( table, icol, Type.DOUBLE, false,
-                                               DOUBLE_NAN ) {
+            return new NumberStarColumnWriter( table, icol, FeatherType.DOUBLE,
+                                               false, DOUBLE_NAN ) {
                 public void writeNumber( OutputStream out, Number val )
                         throws IOException {
                     BufUtils.writeLittleEndianDouble( out, val.doubleValue() );
@@ -50,8 +50,8 @@ public class StarColumnWriters {
             };
         }
         else if ( clazz == Float.class ) {
-            return new NumberStarColumnWriter( table, icol, Type.FLOAT, false,
-                                               FLOAT_NAN ) {
+            return new NumberStarColumnWriter( table, icol, FeatherType.FLOAT,
+                                               false, FLOAT_NAN ) {
                 public void writeNumber( OutputStream out, Number val )
                         throws IOException {
                     BufUtils.writeLittleEndianFloat( out, val.floatValue() );
@@ -59,8 +59,8 @@ public class StarColumnWriters {
             };
         }
         else if ( clazz == Long.class ) {
-            return new NumberStarColumnWriter( table, icol, Type.INT64, true,
-                                               new byte[ 8 ] ) {
+            return new NumberStarColumnWriter( table, icol, FeatherType.INT64,
+                                               true, new byte[ 8 ] ) {
                 public void writeNumber( OutputStream out, Number val )
                         throws IOException {
                     BufUtils.writeLittleEndianLong( out, val.longValue() );
@@ -68,8 +68,8 @@ public class StarColumnWriters {
             };
         }
         else if ( clazz == Integer.class ) {
-            return new NumberStarColumnWriter( table, icol, Type.INT32, true,
-                                               new byte[ 4 ] ) {
+            return new NumberStarColumnWriter( table, icol, FeatherType.INT32,
+                                               true, new byte[ 4 ] ) {
                 public void writeNumber( OutputStream out, Number val )
                         throws IOException {
                     BufUtils.writeLittleEndianInt( out, val.intValue() );
@@ -79,7 +79,8 @@ public class StarColumnWriters {
         else if ( clazz == Short.class ) {
             if ( info.getAuxDatumValue( Tables.UBYTE_FLAG_INFO, Boolean.class )
                  == Boolean.TRUE ) {
-                return new NumberStarColumnWriter( table, icol, Type.UINT8,true,
+                return new NumberStarColumnWriter( table, icol,
+                                                   FeatherType.UINT8, true,
                                                    new byte[ 1 ] ) {
                     public void writeNumber( OutputStream out, Number val )
                             throws IOException {
@@ -88,7 +89,8 @@ public class StarColumnWriters {
                 };
             }
             else {
-                return new NumberStarColumnWriter( table, icol, Type.INT16,true,
+                return new NumberStarColumnWriter( table, icol,
+                                                   FeatherType.INT16, true,
                                                    new byte[ 2 ] ) {
                     public void writeNumber( OutputStream out, Number val )
                             throws IOException {
@@ -98,8 +100,8 @@ public class StarColumnWriters {
             }
         }
         else if ( clazz == Byte.class ) {
-            return new NumberStarColumnWriter( table, icol, Type.INT8, true,
-                                               new byte[ 1 ] ) {
+            return new NumberStarColumnWriter( table, icol, FeatherType.INT8,
+                                               true, new byte[ 1 ] ) {
                 public void writeNumber( OutputStream out, Number val )
                         throws IOException {
                     out.write( val.byteValue() & 0xff );
