@@ -77,7 +77,7 @@ public class FeatherStarTableWriter extends StreamStarTableWriter {
             ItemAccumulator[] accs = new ItemAccumulator[ nic ];
             for ( int jc = 0; jc < nic; jc++ ) {
                 int ic = ics[ jc ];
-                accs[ jc ] = cwList.get( ic ).createItemAccumulator( storage_ );
+                accs[ jc ] = cwList.get( jc ).createItemAccumulator( storage_ );
             }
             RowSequence rseq = table.getRowSequence();
             while ( rseq.next() ) {
