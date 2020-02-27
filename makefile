@@ -3,8 +3,9 @@
 # Otherwise, it just compiles the source files and builds javadocs.
 # Some paths may need changing
 
-JAVAC = /mbt/local/java/jdk1.6.0_41/bin/javac
-JAVADOC = javadoc -Xdoclint:none
+JAVA_HOME = /mbt/local/java/jdk1.6.0_41/bin
+JAVAC = $(JAVA_HOME)/javac
+JAVADOC = $(JAVA_HOME)/javadoc
 
 SRCDIR = java/uk/ac/bristol/star
 FBSDIR = $(SRCDIR)/fbs
