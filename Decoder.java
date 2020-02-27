@@ -318,7 +318,7 @@ public abstract class Decoder<T> {
              * clear to me how to interpret the feather format documentation. */
             new UnsupportedDecoder( FeatherType.CATEGORY ),
             new Decoder<Long>( Long.class, FeatherType.TIMESTAMP ) {
-                public Reader<Long> createReader( Buf buf, long nrow ) {
+                public Reader<Long> createReader( final Buf buf, long nrow ) {
                     return new LongReader() {
                         long get( long ix ) {
                             return buf.getLittleEndianLong( 8 * ix );

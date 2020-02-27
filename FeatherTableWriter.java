@@ -163,7 +163,7 @@ public class FeatherTableWriter {
         for ( int ir = 0; ir < nrow; ir++ ) {
             sdata[ ir ] = (short) ir;
             idata[ ir ] = -ir;
-            ldata[ ir ] = 4_000_000_000L + ir;
+            ldata[ ir ] = 4000000000L + ir;
             fdata[ ir ] = ir == 2 ? Float.NaN : 0.25f + ir;
             ddata[ ir ] = ir == 2 ? Double.NaN : 0.5 + ir;
             tdata[ ir ] = txts[ ir % txts.length ];
