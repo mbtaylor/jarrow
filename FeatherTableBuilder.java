@@ -16,6 +16,12 @@ import uk.ac.starlink.util.FileDataSource;
 import uk.ac.starlink.util.URLDataSource;
 import uk.ac.starlink.util.URLUtils;
 
+/**
+ * TableBuilder implementation for Feather format.
+ *
+ * @author   Mark Taylor
+ * @since    26 Feb 2020
+ */
 public class FeatherTableBuilder implements TableBuilder {
 
     public FeatherTableBuilder() {
@@ -50,6 +56,12 @@ public class FeatherTableBuilder implements TableBuilder {
         throw new TableFormatException( "Can't stream from Feather format" );
     }
 
+    /**
+     * Returns a file corresponding to a DataSource, if possible.
+     *
+     * @param  datsrc  data source
+     * @return   corresponding file, or null if it's not a file
+     */
     private static File getFile( DataSource datsrc ) {
         if ( datsrc instanceof FileDataSource ) {
             return ((FileDataSource) datsrc).getFile();

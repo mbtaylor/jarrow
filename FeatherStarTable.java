@@ -18,6 +18,12 @@ import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.Tables;
 import uk.ac.starlink.table.ValueInfo;
 
+/**
+ * Adaptor from FeatherTable to StarTable.
+ *
+ * @author   Mark Taylor
+ * @since    26 Feb 2020
+ */
 public class FeatherStarTable extends AbstractStarTable {
 
     private final FeatherTable ftable_;
@@ -28,16 +34,34 @@ public class FeatherStarTable extends AbstractStarTable {
     private final ColumnInfo[] colInfos_;
     private final RowReader randomReader_;
 
+    /** JSON key used to store UCDs in column user metadata. */
     public static final String UCD_KEY = "ucd";
+
+    /** JSON key used to store Utypes in column user metadata. */
     public static final String UTYPE_KEY = "utype";
+
+    /** JSON key used to store units in column user metadata. */
     public static final String UNIT_KEY = "unit";
+
+    /** JSON key used to store description text in column user metadata. */
     public static final String DESCRIPTION_KEY = "description";
+
+    /** JSON key to store stringified array shape in column user metadata. */
     public static final String SHAPE_KEY = "shape";
+
+    /** JSON key to store miscellaneous/broken metadata in column metadata. */
     public static final String META_KEY = "meta";
+
+    /** Aux metadata key for column feather type value. */
     public static final ValueInfo FTYPE_INFO =
         new DefaultValueInfo( "feather_type", String.class,
                               "Data type code from Feather format input file" );
 
+    /**
+     * Constructor.
+     *
+     * @param   ftable   feather table object
+     */
     public FeatherStarTable( FeatherTable ftable ) {
         ftable_ = ftable;
         ncol_ = ftable.getColumnCount();
@@ -116,13 +140,19 @@ public class FeatherStarTable extends AbstractStarTable {
         };
     }
 
+    /**
+     * Adapts a FeatherColumn to a ColumnInfo.
+     *
+     * @param  fcol  feather column object
+     * @return  column metadata
+     */
     private static ColumnInfo createColumnInfo( FeatherColumn fcol ) {
         Decoder<?> decoder = fcol.getDecoder();
         Class<?> clazz = decoder.getValueClass();
         FeatherType ftype = decoder.getFeatherType();
         ColumnInfo info = new ColumnInfo( fcol.getName(), clazz, null );
         info.setNullable( fcol.getNullCount() > 0 );
-        Map<String,String> metaMap = getMetaMap( fcol.getUserMeta() );
+        Map<String,String> metaMap = getColumnMetaMap( fcol.getUserMeta() );
         for ( Map.Entry<String,String> entry : metaMap.entrySet() ) {
             String key = entry.getKey();
             String value = entry.getValue();
@@ -150,7 +180,16 @@ public class FeatherStarTable extends AbstractStarTable {
         return info;
     }
 
-    private static Map<String,String> getMetaMap( String userMeta ) {
+    /**
+     * Turns a column user metadata string into a String-&gt;String map.
+     * The input string is assumed or hoped to be in JSON format.
+     * If it has been written by this package, it will contain well-known
+     * keys representing normal column metadata.
+     *
+     * @param  userMeta  user metadata text, hopefully JSON
+     * @return   key-value map
+     */
+    private static Map<String,String> getColumnMetaMap( String userMeta ) {
         Map<String,String> map = new LinkedHashMap<>();
         if ( userMeta != null && userMeta.trim().length() > 0 ) {
             try {
@@ -172,8 +211,19 @@ public class FeatherStarTable extends AbstractStarTable {
         return map;
     }
 
+    /**
+     * Row/column access object that can acquire data values from table.
+     */
     private class RowReader {
+
         final Reader<?>[] rdrs_ = new Reader<?>[ ncol_ ];
+
+        /**
+         * Returns a reader object for a given column.
+         *
+         * @param  icol  column index
+         * @return  column reader
+         */
         Reader<?> getReader( int icol ) throws IOException {
             Reader<?> rdr = rdrs_[ icol ];
             if ( rdr != null ) {
@@ -184,9 +234,24 @@ public class FeatherStarTable extends AbstractStarTable {
                 return rdrs_[ icol ];
             }
         }
+
+        /**
+         * Returns a cell value.
+         *
+         * @param  irow  row index
+         * @param  icol  column index
+         * @return  cell value
+         */
         Object getCell( long irow, int icol ) throws IOException {
             return getReader( icol ).getObject( irow );
         }
+
+        /**
+         * Returns an array of objects giving the cells in a row.
+         *
+         * @param  irow  row index
+         * @return   cell value array
+         */
         Object[] getRow( long irow ) throws IOException {
             Object[] row = new Object[ ncol_ ];
             for ( int ic = 0; ic < ncol_; ic++ ) {

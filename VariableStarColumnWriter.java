@@ -11,12 +11,29 @@ import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StoragePolicy;
 
+/**
+ * StarColumnWriter implementations for variable-length values.
+ *
+ * @author   Mark Taylor
+ * @since    27 Feb 2020
+ */
 public abstract class VariableStarColumnWriter extends StarColumnWriter {
 
     private final PointerSize psize_;
     private static final Logger logger_ =
         Logger.getLogger( "uk.ac.starlink.feather" );
 
+    /**
+     * Constructor.
+     *
+     * @param  table  input table
+     * @param  icol   column index
+     * @param  ftype  output data type
+     * @param  isNullable  if true, nulls will be marked as invalid;
+     *                     if false, they will just be represented
+     *                     as zero length
+     * @param  psize  pointer size
+     */
     protected VariableStarColumnWriter( StarTable table, int icol,
                                         FeatherType ftype, boolean isNullable,
                                         PointerSize psize ) {
@@ -24,7 +41,23 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         psize_ = psize;
     }
 
+    /**
+     * Returns the number of bytes that a given item will occupy in
+     * the output stream.
+     *
+     * @param  item   writable value
+     * @return   byte count
+     */
     public abstract int getItemSize( Object item );
+
+    /**
+     * Writes a value to the output stream.
+     * The output value must be consistent with {@link #getItemSize}.
+     *
+     * @param  out   destination stream
+     * @param  item  writable value
+     * @return  number of bytes written
+     */
     public abstract int writeItemBytes( OutputStream out, Object item )
             throws IOException;
 
@@ -113,6 +146,14 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         };
     }
 
+    /**
+     * Writes the index block giving start positions of each item in
+     * the output data block.
+     *
+     * @param  out  destination stream
+     * @param  rseq   row sequence containing data to write
+     * @return   details about what was actually written
+     */
     private IndexStatus writeOffsets( OutputStream out, RowSequence rseq )
             throws IOException {
         final int icol = getColumnIndex();
@@ -139,6 +180,16 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         return new IndexStatus( nrow, nrow, ioff );
     }
 
+    /**
+     * Returns a column writer for variable-length string values.
+     *
+     * @param  table  input table
+     * @param  icol   column index
+     * @param  isNullable  if true, nulls will be marked as invalid;
+     *                     if false, they will just be represented
+     *                     as zero length strings
+     * @param  psize  pointer size
+     */
     public static VariableStarColumnWriter
             createStringWriter( StarTable table, int icol,
                                 boolean isNullable, PointerSize psize ) {
@@ -163,6 +214,16 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         };
     }
 
+    /**
+     * Returns a column writer for variable-length byte array values.
+     *
+     * @param  table  input table
+     * @param  icol   column index
+     * @param  isNullable  if true, nulls will be marked as invalid;
+     *                     if false, they will just be represented
+     *                     as zero length arrays
+     * @param  psize  pointer size
+     */
     public static VariableStarColumnWriter
             createByteArrayWriter( StarTable table, int icol,
                                    boolean isNullable, PointerSize psize ) {
@@ -187,8 +248,12 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         };
     }
 
+    /**
+     * Enumeration for pointer size.
+     */
     public enum PointerSize {
 
+        /** Short (32-bit) pointer size. */
         I32( 4, FeatherType.UTF8, FeatherType.BINARY ) {
             void writeOffset( OutputStream out, long ioff ) throws IOException {
                 BufUtils.writeLittleEndianInt( out, (int) ioff );
@@ -197,6 +262,8 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
                 return ioff >= Integer.MAX_VALUE;
             }
         },
+
+        /** Long (64-bit) pointer size. */
         I64( 8, FeatherType.LARGE_UTF8, FeatherType.LARGE_BINARY ) {
             void writeOffset( OutputStream out, long ioff ) throws IOException {
                 BufUtils.writeLittleEndianLong( out, ioff );
@@ -210,6 +277,13 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         final FeatherType utf8Type_;
         final FeatherType binaryType_;
 
+        /**
+         * Constructor.
+         *
+         * @param  nbyte  bytes per pointer
+         * @param  utf8Type  feather type for UTF8 strings
+         * @param  binaryType  feather tyep for byte array strings
+         */
         private PointerSize( int nbyte, FeatherType utf8Type,
                              FeatherType binaryType ) {
             nbyte_ = nbyte;
@@ -221,10 +295,22 @@ public abstract class VariableStarColumnWriter extends StarColumnWriter {
         abstract boolean isOverflow( long ioff );
     }
 
+    /**
+     * Aggregates information about an index block that has been written.
+     */
     private static class IndexStatus {
         final long rowCount_;
         final long entryCount_;
         final long byteCount_;
+
+        /**
+         * Constructor.
+         *
+         * @param  rowCount  number of rows
+         * @param  entryCount  number of data values to actually write
+         *                     (may differ from nrow in case of overflow)
+         * @param  byteCount  byte count for data block
+         */
         IndexStatus( long rowCount, long entryCount, long byteCount ) {
             rowCount_ = rowCount;
             entryCount_ = entryCount;

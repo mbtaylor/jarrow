@@ -13,6 +13,12 @@ import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StoragePolicy;
 
+/**
+ * FeatherColumnWriter for use with StarTables.
+ *
+ * @author   Mark Taylor
+ * @since    26 Feb 2020
+ */
 public abstract class StarColumnWriter implements FeatherColumnWriter {
 
     private final StarTable table_;
@@ -21,12 +27,16 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
     private final boolean isNullable_;
 
     /**
+     * Constructor.
+     *
      * The <code>isNullable</code> parameter only needs to be given true
      * if the writeData method cannot represent null values in its
      * byte representation.
      *
-     * @param  isNullable  contains any null values which should be marked
-     *                     as such in the null values mask
+     * @param  table  inupt table
+     * @param  icol   column index in input table
+     * @param  featherType  data type for output column
+     * @param  isNullable  true iff writeData cannot write in-band null values
      */
     protected StarColumnWriter( StarTable table, int icol,
                                 FeatherType featherType, boolean isNullable ) {
@@ -36,22 +46,49 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
         isNullable_ = isNullable;
     }
 
-    // Excluding any mask.  Doesn't need to be aligned.
+    /**
+     * Writes the bytes consituting the data stream for this column,
+     * excluding any optional validity mask.
+     * Note the output does not need to be aligned on an 8-byte boundary.
+     *
+     * @param   out  destination stream
+     * @return   information about what was actually written
+     */
     public abstract DataStat writeDataBytes( OutputStream out )
             throws IOException;
 
+    /**
+     * Returns the table on which this writer is operating.
+     *
+     * @return   input table
+     */
     public StarTable getTable() {
         return table_;
     }
 
+    /**
+     * Returns the index of the input table column which is being written.
+     *
+     * @return  input column index
+     */
     public int getColumnIndex() {
         return icol_;
     }
 
+    /**
+     * Returns the output data type code.
+     *
+     * @return  feather output type
+     */
     public FeatherType getFeatherType() {
         return featherType_;
     }
 
+    /**
+     * Indicates whether this writer may write a validity mask.
+     *
+     * @return   true iff output type supports masked null values
+     */
     public boolean isNullable() {
         return isNullable_;
     }
@@ -63,13 +100,13 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
     public String getUserMetadata() {
         ColumnInfo info = table_.getColumnInfo( icol_ );
         JSONObject json = new JSONObject();
-        addEntry( json, FeatherStarTable.UNIT_KEY, info.getUnitString() );
-        addEntry( json, FeatherStarTable.UCD_KEY, info.getUCD() );
-        addEntry( json, FeatherStarTable.UTYPE_KEY, info.getUtype() );
-        addEntry( json, FeatherStarTable.DESCRIPTION_KEY,
-                  info.getDescription() );
-        addEntry( json, FeatherStarTable.SHAPE_KEY,
-                  DefaultValueInfo.formatShape( info.getShape() ) );
+        addJsonEntry( json, FeatherStarTable.UNIT_KEY, info.getUnitString() );
+        addJsonEntry( json, FeatherStarTable.UCD_KEY, info.getUCD() );
+        addJsonEntry( json, FeatherStarTable.UTYPE_KEY, info.getUtype() );
+        addJsonEntry( json, FeatherStarTable.DESCRIPTION_KEY,
+                      info.getDescription() );
+        addJsonEntry( json, FeatherStarTable.SHAPE_KEY,
+                      DefaultValueInfo.formatShape( info.getShape() ) );
         return json.length() > 0
              ? json.toString( 0 ).replaceAll( "\n", " " )
              : null;
@@ -144,22 +181,53 @@ public abstract class StarColumnWriter implements FeatherColumnWriter {
     public abstract ItemAccumulator
         createItemAccumulator( StoragePolicy storage );
 
-    private static void addEntry( JSONObject json, String key, String value ) {
+    /**
+     * Adds a key-value entry to a supplied JSON object.
+     *
+     * @param  json  json object (map), altered on exit
+     * @param  key   key to add
+     * @param  value  value to add
+     */
+    private static void addJsonEntry( JSONObject json,
+                                      String key, String value ) {
         if ( value != null && value.trim().length() > 0 ) {
             json.put( key, value );
         }
     }
 
-    public class DataStat {
+    /**
+     * Aggregates information about column output.
+     */
+    public static class DataStat {
+
         private final long byteCount_;
         private final long rowCount_;
+
+        /**
+         * Constructor.
+         *
+         * @param  byteCount  number of bytes written
+         * @param  rowCount  number of rows written
+         */
         public DataStat( long byteCount, long rowCount ) {
             byteCount_ = byteCount;
             rowCount_ = rowCount;
         }
+
+        /**
+         * Returns the number of bytes written.
+         *
+         * @return  byte count
+         */
         public long getByteCount() {
             return byteCount_;
         }
+
+        /**
+         * Returns the number of rows written.
+         *
+         * @return  row count
+         */
         public long getRowCount() {
             return rowCount_;
         }

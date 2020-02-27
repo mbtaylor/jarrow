@@ -9,8 +9,20 @@ import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StoragePolicy;
 
+/**
+ * StarColumnWriter implementation for boolean values.
+ *
+ * @author   Mark Taylor
+ * @since    27 Feb 2020
+ */
 public class BooleanStarColumnWriter extends StarColumnWriter {
 
+    /**
+     * Constructor.
+     *
+     * @param   table  table
+     * @param   icol  column index
+     */
     public BooleanStarColumnWriter( StarTable table, int icol ) {
         super( table, icol, FeatherType.BOOL, true );
     }

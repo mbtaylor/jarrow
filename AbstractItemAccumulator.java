@@ -8,6 +8,13 @@ import java.io.OutputStream;
 import uk.ac.starlink.table.ByteStore;
 import uk.ac.starlink.table.StoragePolicy;
 
+/**
+ * Partial ItemAccumulator implementation that handles
+ * generic aspects including writing the optional validity mask.
+ *
+ * @author   Mark Taylor
+ * @since    27 Feb 2020
+ */
 public abstract class AbstractItemAccumulator implements ItemAccumulator {
 
     private final StoragePolicy storage_;
@@ -19,6 +26,14 @@ public abstract class AbstractItemAccumulator implements ItemAccumulator {
     private int ibit_;
     private int mask_;
 
+    /**
+     * Constructor.
+     *
+     * @param  storage  storage policy for buffering output data
+     * @param  isNullable   if true, preparations will be made to write
+     *                      the validity mask; it will only be actually
+     *                      output if there are some null values
+     */
     protected AbstractItemAccumulator( StoragePolicy storage,
                                        boolean isNullable ) {
         storage_ = storage;
@@ -29,10 +44,49 @@ public abstract class AbstractItemAccumulator implements ItemAccumulator {
                  : null;
     }
 
-    public abstract void addDataItem( Object item ) throws IOException;
-    // doesn't need to be aligned
+    /**
+     * Adds the given item to the list to be output.
+     * This method is invoked from this AbstractItemAccumulator's
+     * {@link #addItem} method, and is just the hook for the
+     * subclass-specific behaviour.
+     *
+     * @param  item  cell value
+     */
+    protected abstract void addDataItem( Object item ) throws IOException;
+
+    /**
+     * Releases resources.
+     * This method is invoked from this AbstractItemAccumulator's
+     * {@link #close} method, and is just the hook for the
+     * subclass-specific behaviour.
+     */
+    protected abstract void closeData() throws IOException;
+
+    /**
+     * Tests whether a given added data item is null
+     * (whether it needs to be flagged as null in the validity mask).
+     * This method is only ever called for nullable columns
+     * (if the <code>isNullable</code> flag was set true at construction time).
+     *
+     * <p>The default implementation tests whether the supplied item
+     * is in fact <code>null</code>, but it may be overridden.
+     *
+     * @param  item  value to test
+     * @return  true iff item is to be flagged null
+     */
+    protected boolean isNull( Object item ) {
+        return item == null;
+    }
+
+    /**
+     * Writes the bytes constituting the data stream for this column,
+     * excluding any optional validity mask.
+     * Note the output does not need to be aligned on an 8-byte boundary.
+     *
+     * @param   out  destination stream
+     * @return   number of bytes written
+     */
     public abstract long writeDataBytes( OutputStream out ) throws IOException;
-    public abstract void closeData() throws IOException;
 
     public void close() throws IOException {
         if ( isNullable_ ) {
@@ -45,7 +99,7 @@ public abstract class AbstractItemAccumulator implements ItemAccumulator {
     public void addItem( Object item ) throws IOException {
         nRow_++;
         if ( isNullable_ ) {
-            if ( item == null ) {
+            if ( isNull( item ) ) {
                 nNull_++;
             }
             else {

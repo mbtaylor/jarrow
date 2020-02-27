@@ -9,21 +9,43 @@ import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StoragePolicy;
 
+/**
+ * StarColumnWriter implementation for numeric values.
+ *
+ * @author   Mark Taylor
+ * @since    27 Feb 2020
+ */
 public abstract class NumberStarColumnWriter extends StarColumnWriter {
 
     private final byte[] blank_;
     private final int itemSize_;
 
-    public NumberStarColumnWriter( StarTable table, int icol,
-                                   FeatherType featherType, boolean isNullable,
-                                   byte[] blank ) {
+    /**
+     * Constructor.
+     *
+     * @param  table  input table
+     * @param  icol   column index
+     * @param  featherType   output data type
+     * @param  isNullable  true iff no in-band blank representation exists
+     * @param  blank  byte pattern of blank value;
+     *                the length of this array also defines the output item
+     *                size in bytes
+     */
+    protected NumberStarColumnWriter( StarTable table, int icol,
+                                      FeatherType featherType,
+                                      boolean isNullable, byte[] blank ) {
         super( table, icol, featherType, isNullable );
         blank_ = blank.clone();
         itemSize_ = blank.length;
     }
 
-    // value not null
-    public abstract void writeNumber( OutputStream out, Number value )
+    /**
+     * Writes the bytes for a given typed value.
+     *
+     * @param  out  destination stream
+     * @param  value   non-null typed value to write
+     */
+    protected abstract void writeNumber( OutputStream out, Number value )
             throws IOException;
 
     public DataStat writeDataBytes( OutputStream out ) throws IOException {

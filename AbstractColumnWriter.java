@@ -109,8 +109,8 @@ public abstract class AbstractColumnWriter implements FeatherColumnWriter {
     }
 
     /**
-     * Tests the value at a given row for nullness (whether it needs to be
-     * flagged as null in the validity mask).
+     * Tests the value at a given row for nullness
+     * (whether it needs to be flagged as null in the validity mask).
      * This method is only ever called for nullable columns
      * (if the <code>isNullable</code> flag was set true at construction time).
      *
@@ -120,11 +120,11 @@ public abstract class AbstractColumnWriter implements FeatherColumnWriter {
     public abstract boolean isNull( long irow );
 
     /**
-     * Writes the bytes consituting the data stream for this column,
+     * Writes the bytes constituting the data stream for this column,
      * excluding any optional validity mask.
      * Note the output does not need to be aligned on an 8-byte boundary.
      *
-     * @param   out  desitination stream
+     * @param   out  destination stream
      * @return   number of bytes written
      */
     public abstract long writeDataBytes( OutputStream out ) throws IOException;

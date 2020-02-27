@@ -9,9 +9,15 @@ import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.Tables;
 
-
+/**
+ * Implementations of StarColumnWriter.
+ *
+ * @author   Mark Taylor
+ * @since    26 Feb 2020
+ */
 public class StarColumnWriters {
 
+    /** Default pointer size for variable-length column output. */
     public static final VariableStarColumnWriter.PointerSize VAR_POINTER_SIZE =
         VariableStarColumnWriter.PointerSize.I64;
     private static final byte[] FLOAT_NAN;
@@ -33,9 +39,19 @@ public class StarColumnWriters {
         assert FLOAT_NAN.length == 4;
     }
 
+    /**
+     * Private constructor prevents instantiation.
+     */
     private StarColumnWriters() {
     }
 
+    /**
+     * Returns a StarColumnWriter suitable for a given column of a StarTable.
+     *
+     * @param  table  table
+     * @param  icol   column index
+     * @return  column writer, or null if feather output is not possible
+     */
     public static StarColumnWriter
             createColumnWriter( StarTable table, int icol ) {
         ColumnInfo info = table.getColumnInfo( icol );
