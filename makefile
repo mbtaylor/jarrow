@@ -33,14 +33,15 @@ JSRC = \
        java/uk/ac/bristol/star/feather/VariableLengthRandomWriter.java \
 
 FBSRC = \
-       fbs/com/google/flatbuffers/ByteBufferUtil.java \
-       fbs/com/google/flatbuffers/Constants.java \
-       fbs/com/google/flatbuffers/FlatBufferBuilder.java \
-       fbs/com/google/flatbuffers/Struct.java \
-       fbs/com/google/flatbuffers/Table.java \
-       fbs/com/google/flatbuffers/Utf8.java \
-       fbs/com/google/flatbuffers/Utf8Old.java \
-       fbs/com/google/flatbuffers/Utf8Safe.java \
+       java/uk/ac/bristol/star/fbs/google/ByteBufferUtil.java \
+       java/uk/ac/bristol/star/fbs/google/Constants.java \
+       java/uk/ac/bristol/star/fbs/google/FlatBufferBuilder.java \
+       java/uk/ac/bristol/star/fbs/google/Struct.java \
+       java/uk/ac/bristol/star/fbs/google/Table.java \
+       java/uk/ac/bristol/star/fbs/google/Utf8.java \
+       java/uk/ac/bristol/star/fbs/google/Utf8Safe.java \
+
+FBFEATHERSRC = \
        fbs/jarrow/fbs/feather/CategoryMetadata.java \
        fbs/jarrow/fbs/feather/Column.java \
        fbs/jarrow/fbs/feather/CTable.java \
