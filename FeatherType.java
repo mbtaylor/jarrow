@@ -1,10 +1,10 @@
 package uk.ac.bristol.star.feather;
 
-import jarrow.fbs.feather.Type;
+import uk.ac.bristol.star.fbs.feather.Type;
 
 /**
  * Enumeration class for Feather-format type constants.
- * This is just a type-safe copy of {@link jarrow.fbs.feather.Type}.
+ * This is just a type-safe copy of {@link uk.ac.bristol.star.fbs.feather.Type}.
  *
  * @author   Mark Taylor
  * @since    26 Feb 2020

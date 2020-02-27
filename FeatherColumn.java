@@ -1,7 +1,7 @@
 package uk.ac.bristol.star.feather;
 
-import jarrow.fbs.feather.Column;
 import java.io.IOException;
+import uk.ac.bristol.star.fbs.feather.Column;
 
 /**
  * Represents a column in a readable Feather-format table.

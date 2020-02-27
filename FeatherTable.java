@@ -1,13 +1,13 @@
 package uk.ac.bristol.star.feather;
 
-import jarrow.fbs.feather.CTable;
-import jarrow.fbs.feather.Column;
-import jarrow.fbs.feather.PrimitiveArray;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import uk.ac.bristol.star.fbs.feather.CTable;
+import uk.ac.bristol.star.fbs.feather.Column;
+import uk.ac.bristol.star.fbs.feather.PrimitiveArray;
 
 /**
  * Presents a readable view of a feather-format table on disk.

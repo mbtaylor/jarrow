@@ -1,11 +1,11 @@
 package uk.ac.bristol.star.feather;
 
-import jarrow.fbs.feather.CTable;
-import jarrow.fbs.feather.Column;
-import jarrow.fbs.feather.PrimitiveArray;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import uk.ac.bristol.star.fbs.feather.CTable;
+import uk.ac.bristol.star.fbs.feather.Column;
+import uk.ac.bristol.star.fbs.feather.PrimitiveArray;
 import uk.ac.bristol.star.fbs.google.FlatBufferBuilder;
 
 /**
