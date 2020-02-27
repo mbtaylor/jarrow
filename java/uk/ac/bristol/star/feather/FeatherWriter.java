@@ -14,7 +14,7 @@ import uk.ac.bristol.star.fbs.google.FlatBufferBuilder;
  * @author   Mark Taylor
  * @since    26 Feb 2020
  */
-public class FeatherTableWriter {
+public class FeatherWriter {
 
     /** Supported version of the Feather format. */
     public static final int FEATHER_VERSION = 1;
@@ -30,8 +30,8 @@ public class FeatherTableWriter {
      * @param  tableMeta  optional user metadata string, should probably be JSON
      * @param  colWriters  objects that can write column data
      */
-    public FeatherTableWriter( String description, String tableMeta,
-                               FeatherColumnWriter[] colWriters ) {
+    public FeatherWriter( String description, String tableMeta,
+                          FeatherColumnWriter[] colWriters ) {
         description_ = description;
         tableUserMeta_ = tableMeta;
         colWriters_ = colWriters;
@@ -177,7 +177,7 @@ public class FeatherTableWriter {
             VariableLengthRandomWriter.createStringWriter( "tcol", tdata,
                                                            null, false ),
         };
-        new FeatherTableWriter( "test table", null, writers )
+        new FeatherWriter( "test table", null, writers )
            .write( System.out );
     }
 }

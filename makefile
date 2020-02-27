@@ -15,35 +15,22 @@ FLATC = /mbt/github/flatbuffers/flatc
 JARFILE = jarrow.jar
 
 JSRC = \
-       AbstractColumnWriter.java \
-       BooleanRandomWriter.java \
-       Buf.java \
-       BufAccess.java \
-       BufMapper.java \
-       BufUtils.java \
-       ColStat.java \
-       Decoder.java \
-       FeatherColumn.java \
-       FeatherColumnWriter.java \
-       FeatherTable.java \
-       FeatherTableWriter.java \
-       FeatherType.java \
-       NumberRandomWriter.java \
-       Reader.java \
-       VariableLengthRandomWriter.java \
-
-STIL_JSRC = \
-       FeatherStarTable.java \
-       FeatherStarTableWriter.java \
-       FeatherTableBuilder.java \
-       \
-       AbstractItemAccumulator.java \
-       BooleanStarColumnWriter.java \
-       ItemAccumulator.java \
-       NumberStarColumnWriter.java \
-       StarColumnWriter.java \
-       StarColumnWriters.java \
-       VariableStarColumnWriter.java \
+       java/uk/ac/bristol/star/feather/AbstractColumnWriter.java \
+       java/uk/ac/bristol/star/feather/BooleanRandomWriter.java \
+       java/uk/ac/bristol/star/feather/Buf.java \
+       java/uk/ac/bristol/star/feather/BufAccess.java \
+       java/uk/ac/bristol/star/feather/BufMapper.java \
+       java/uk/ac/bristol/star/feather/BufUtils.java \
+       java/uk/ac/bristol/star/feather/ColStat.java \
+       java/uk/ac/bristol/star/feather/Decoder.java \
+       java/uk/ac/bristol/star/feather/FeatherColumn.java \
+       java/uk/ac/bristol/star/feather/FeatherColumnWriter.java \
+       java/uk/ac/bristol/star/feather/FeatherTable.java \
+       java/uk/ac/bristol/star/feather/FeatherType.java \
+       java/uk/ac/bristol/star/feather/FeatherWriter.java \
+       java/uk/ac/bristol/star/feather/NumberRandomWriter.java \
+       java/uk/ac/bristol/star/feather/Reader.java \
+       java/uk/ac/bristol/star/feather/VariableLengthRandomWriter.java \
 
 FBSRC = \
        fbs/com/google/flatbuffers/ByteBufferUtil.java \
