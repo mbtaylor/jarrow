@@ -28,6 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+// NOTE: package name changed by MBT to avoid possible namespace clashes.
+// package com.google.flatbuffers;
 package uk.ac.bristol.star.fbs.google;
 
 import java.nio.ByteBuffer;

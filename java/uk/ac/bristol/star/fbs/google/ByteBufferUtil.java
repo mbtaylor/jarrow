@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// NOTE: package name changed by MBT to avoid possible namespace clashes.
+// package com.google.flatbuffers;
 package uk.ac.bristol.star.fbs.google;
 
 import static uk.ac.bristol.star.fbs.google.Constants.*;

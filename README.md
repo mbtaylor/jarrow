@@ -23,7 +23,6 @@ I'm using it to provide Feather table I/O handlers in
 [STIL](http://www.starlink.ac.uk/stil/)/[TOPCAT](http://www.starlink.ac.uk/topcat/).
 
 This library probably does less clever stuff than the Apache one
-(e.g. there is no attempt at parallel I/O),
 but it's much more compact and has no external dependencies.
 
 Building
@@ -55,6 +54,8 @@ are not fully supported on input:
    * **TIMESTAMP, DATE, TIME:** These values can be read, but the
      type-specific metadata/unit information is not currently available.
 
+The reading is implemented using memory mapping (MappedByteBuffers).
+
 The `LARGE_UTF8` and `LARGE_BINARY` types defined in the
 [Arrow](https://github.com/apache/arrow/blob/master/cpp/src/arrow/ipc/feather.fbs)
 but _not_ in the
@@ -80,6 +81,10 @@ Usage
 Comprehensive documentation is provided in the
 [javadocs](https://mbtaylor.github.io/jarrow/javadocs/).
 
+The classes in the package uk.ac.bristol.star.feather form the
+usable parts of the I/O library.  The classes in the
+uk.ac.bristol.star.fbs.* packages are flatbuffer support files
+that you shouldn't need to use.
 To read a table, you can use `FeatherTable.fromFile(File)` method;
 examples in `FeatherTable.main`.
 
