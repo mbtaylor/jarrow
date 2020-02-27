@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace arrow.ipc.feather.fbs;
+namespace uk.ac.bristol.star.fbs.feather;
 
 /// Feather is an experimental serialization format implemented using
 /// techniques from Apache Arrow. It was created as a proof-of-concept of an

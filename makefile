@@ -11,7 +11,6 @@ VERSION = 1.0
 SRCDIR = java/uk/ac/bristol/star
 FBSDIR = $(SRCDIR)/fbs
 
-NAMESPACE = uk.ac.bristol.star.fbs.feather
 PYTHON_DIR = /mbt/local/pkg/miniconda3/bin
 PYTHON = $(PYTHON_DIR)/python3
 
@@ -91,15 +90,11 @@ data.fea: data.py
 big.fea: big.py
 	$(PYTHON) big.py
 
-feather_metadata.fbs: feather.fbs
-	sed -e 's/^namespace.*/namespace $(NAMESPACE);/' \
-            <feather.fbs >$@
-
 $(FBSRC) $(FBFEATHERSRC):
 	rm -rf $(FBSDIR)
 	mkdir -p $(FBSDIR)
 	cd java; \
-        $(FLATC) --java ../feather_metadata.fbs
+        $(FLATC) --java ../feather.fbs
 
 $(JARFILE): $(JSRC) $(FBSRC) $(FBFEATHERSRC)
 	rm -rf tmp
