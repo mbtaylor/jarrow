@@ -58,19 +58,19 @@ FBFEATHERSRC = \
        $(FBSDIR)/feather/Type.java \
        $(FBSDIR)/feather/TypeMetadata.java \
 
-build: $(JARFILE) javadocs data.fea
+build: $(JARFILE) javadocs
 
-read: $(JARFILE) data.fea
+read: $(JARFILE) test/data.fea
 	java -ea -classpath $(JARFILE) \
-             uk.ac.bristol.star.feather.FeatherTable data.fea
+             uk.ac.bristol.star.feather.FeatherTable test/data.fea
 
-write: test.fea
+write: test/test.fea
 
-rw: test.fea
+rw: test/test.fea
 	java -ea -classpath $(JARFILE) \
-             uk.ac.bristol.star.feather.FeatherTable test.fea
+             uk.ac.bristol.star.feather.FeatherTable test/test.fea
 
-test.fea: $(JARFILE)
+test/test.fea: $(JARFILE)
 	java -ea -classpath $(JARFILE) \
              uk.ac.bristol.star.feather.FeatherWriter >$@
 
@@ -84,10 +84,10 @@ javadocs: $(JSRC)
                 -d javadocs \
                 $(JSRC) $(FBSRC) $(FBFEATHERSRC)
 
-data.fea: data.py
+test/data.fea: test/data.py
 	$(PYTHON) data.py
 
-big.fea: big.py
+test/big.fea: test/big.py
 	$(PYTHON) big.py
 
 $(FBSRC) $(FBFEATHERSRC):
@@ -107,11 +107,11 @@ $(JARFILE): $(JSRC) $(FBSRC) $(FBFEATHERSRC)
 
 clean:
 	rm -f $(JARFILE)
-	rm -f test.fea x.fea x.vot big.fea
+	rm -f test.fea big.fea
 	rm -rf tmp javadocs
 
 veryclean: clean
-	rm -f data.fea feather_metadata.fbs
+	rm -f test/data.fea
 	rm -rf $(FBSDIR)
 
 
