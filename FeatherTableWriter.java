@@ -1,4 +1,4 @@
-package jarrow.feather;
+package uk.ac.bristol.star.feather;
 
 import jarrow.fbs.feather.CTable;
 import jarrow.fbs.feather.Column;

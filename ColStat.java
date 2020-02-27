@@ -1,4 +1,4 @@
-package jarrow.feather;
+package uk.ac.bristol.star.feather;
 
 /**
  * Characterises what was written by a column writer.

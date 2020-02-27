@@ -1,10 +1,10 @@
 package uk.ac.starlink.feather;
 
-import jarrow.feather.BufUtils;
-import jarrow.feather.ColStat;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import uk.ac.bristol.star.feather.BufUtils;
+import uk.ac.bristol.star.feather.ColStat;
 import uk.ac.starlink.table.ByteStore;
 import uk.ac.starlink.table.StoragePolicy;
 

@@ -1,8 +1,8 @@
 package uk.ac.starlink.feather;
 
-import jarrow.feather.ColStat;
 import java.io.IOException;
 import java.io.OutputStream;
+import uk.ac.bristol.star.feather.ColStat;
 
 /**
  * Collects all the values of a column and then writes them out as

@@ -1,15 +1,15 @@
 package uk.ac.starlink.feather;
 
-import jarrow.feather.Decoder;
-import jarrow.feather.FeatherColumn;
-import jarrow.feather.FeatherTable;
-import jarrow.feather.FeatherType;
-import jarrow.feather.Reader;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
+import uk.ac.bristol.star.feather.Decoder;
+import uk.ac.bristol.star.feather.FeatherColumn;
+import uk.ac.bristol.star.feather.FeatherTable;
+import uk.ac.bristol.star.feather.FeatherType;
+import uk.ac.bristol.star.feather.Reader;
 import uk.ac.starlink.table.AbstractStarTable;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.DefaultValueInfo;

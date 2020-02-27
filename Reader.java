@@ -1,4 +1,4 @@
-package jarrow.feather;
+package uk.ac.bristol.star.feather;
 
 /**
  * Reads a value from a given slot of a feather column.

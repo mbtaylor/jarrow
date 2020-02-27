@@ -1,4 +1,4 @@
-package jarrow.feather;
+package uk.ac.bristol.star.feather;
 
 import java.io.IOException;
 import java.io.OutputStream;

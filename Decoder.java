@@ -1,4 +1,4 @@
-package jarrow.feather;
+package uk.ac.bristol.star.feather;
 
 import java.util.Arrays;
 import java.util.Collections;

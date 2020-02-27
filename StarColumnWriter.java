@@ -1,12 +1,12 @@
 package uk.ac.starlink.feather;
 
-import jarrow.feather.BufUtils;
-import jarrow.feather.ColStat;
-import jarrow.feather.FeatherColumnWriter;
-import jarrow.feather.FeatherType;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.json.JSONObject;
+import uk.ac.bristol.star.feather.BufUtils;
+import uk.ac.bristol.star.feather.ColStat;
+import uk.ac.bristol.star.feather.FeatherColumnWriter;
+import uk.ac.bristol.star.feather.FeatherType;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.DefaultValueInfo;
 import uk.ac.starlink.table.RowSequence;

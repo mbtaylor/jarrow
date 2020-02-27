@@ -1,10 +1,10 @@
 package uk.ac.starlink.feather;
 
 import java.awt.datatransfer.DataFlavor;
-import jarrow.feather.FeatherTable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import uk.ac.bristol.star.feather.FeatherTable;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StoragePolicy;
 import uk.ac.starlink.table.TableBuilder;

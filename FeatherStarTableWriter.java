@@ -1,14 +1,14 @@
 package uk.ac.starlink.feather;
 
-import jarrow.feather.ColStat;
-import jarrow.feather.FeatherColumnWriter;
-import jarrow.feather.FeatherTableWriter;
-import jarrow.feather.FeatherType;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import uk.ac.bristol.star.feather.ColStat;
+import uk.ac.bristol.star.feather.FeatherColumnWriter;
+import uk.ac.bristol.star.feather.FeatherTableWriter;
+import uk.ac.bristol.star.feather.FeatherType;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StoragePolicy;

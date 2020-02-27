@@ -1,4 +1,4 @@
-package jarrow.feather;
+package uk.ac.bristol.star.feather;
 
 /**
  * Provides methods to work with a potentially large byte buffer.

@@ -1,11 +1,11 @@
 package uk.ac.starlink.feather;
 
-import jarrow.feather.BufUtils;
-import jarrow.feather.FeatherType;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Logger;
+import uk.ac.bristol.star.feather.BufUtils;
+import uk.ac.bristol.star.feather.FeatherType;
 import uk.ac.starlink.table.ByteStore;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
