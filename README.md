@@ -29,7 +29,8 @@ Building
 --------
 
 If you want the library, the best thing is just to pick up the
-pre-built `jarrow.jar` file from the release.
+pre-built `jarrow.jar` file from the
+[release](https://github.com/mbtaylor/jarrow/releases).
 
 However, if you want to build it from source, there's a makefile.
 It may need editing since some targets contains references to
@@ -105,8 +106,13 @@ currently present, please contact me (@mbtaylor).
 Licence
 -------
 
-Available under the LGPL.  If that's not good for you I can probably
-add another licence.
+This library includes google flatbuffers code which is licenced
+under the Apache 2.0 licence.
+I'm prepared to offer any licence to the original parts of this
+project that suits you and that's legally possible.
+For now, I assert that it's licenced under the LGPL.
+Unless somebody tells me I'm not allowed to do that.
+
 
 History
 -------
