@@ -6,7 +6,7 @@ import jarrow.fbs.feather.PrimitiveArray;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import com.google.flatbuffers.FlatBufferBuilder;
+import uk.ac.bristol.star.fbs.google.FlatBufferBuilder;
 
 /**
  * Can write table data to a Feather-format file.

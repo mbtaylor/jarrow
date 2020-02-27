@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.flatbuffers;
+package uk.ac.bristol.star.fbs.google;
 
 /// @cond FLATBUFFERS_INTERNAL
 

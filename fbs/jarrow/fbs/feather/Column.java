@@ -5,7 +5,7 @@ package jarrow.fbs.feather;
 import java.nio.*;
 import java.lang.*;
 import java.util.*;
-import com.google.flatbuffers.*;
+import uk.ac.bristol.star.fbs.google.*;
 
 @SuppressWarnings("unused")
 public final class Column extends Table {

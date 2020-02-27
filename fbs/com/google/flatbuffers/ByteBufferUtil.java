@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.flatbuffers;
+package uk.ac.bristol.star.fbs.google;
 
-import static com.google.flatbuffers.Constants.*;
+import static uk.ac.bristol.star.fbs.google.Constants.*;
 
 import java.nio.ByteBuffer;
 
