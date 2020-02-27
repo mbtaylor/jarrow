@@ -42,18 +42,19 @@ FBSRC = \
        java/uk/ac/bristol/star/fbs/google/Utf8Safe.java \
 
 FBFEATHERSRC = \
-       fbs/jarrow/fbs/feather/CategoryMetadata.java \
-       fbs/jarrow/fbs/feather/Column.java \
-       fbs/jarrow/fbs/feather/CTable.java \
-       fbs/jarrow/fbs/feather/DateMetadata.java \
-       fbs/jarrow/fbs/feather/Encoding.java \
-       fbs/jarrow/fbs/feather/PrimitiveArray.java \
-       fbs/jarrow/fbs/feather/TimeMetadata.java \
-       fbs/jarrow/fbs/feather/TimestampMetadata.java \
-       fbs/jarrow/fbs/feather/TimeUnit.java \
-       fbs/jarrow/fbs/feather/Type.java \
-       fbs/jarrow/fbs/feather/TypeMetadata.java \
-       \
+       java/uk/ac/bristol/star/fbs/feather/CategoryMetadata.java \
+       java/uk/ac/bristol/star/fbs/feather/Column.java \
+       java/uk/ac/bristol/star/fbs/feather/CTable.java \
+       java/uk/ac/bristol/star/fbs/feather/DateMetadata.java \
+       java/uk/ac/bristol/star/fbs/feather/Encoding.java \
+       java/uk/ac/bristol/star/fbs/feather/PrimitiveArray.java \
+       java/uk/ac/bristol/star/fbs/feather/TimeMetadata.java \
+       java/uk/ac/bristol/star/fbs/feather/TimestampMetadata.java \
+       java/uk/ac/bristol/star/fbs/feather/TimeUnit.java \
+       java/uk/ac/bristol/star/fbs/feather/Type.java \
+       java/uk/ac/bristol/star/fbs/feather/TypeMetadata.java \
+
+FBARROWSRC = \
        fbs/jarrow/fbs/arrow/Binary.java \
        fbs/jarrow/fbs/arrow/Block.java \
        fbs/jarrow/fbs/arrow/Bool.java \
