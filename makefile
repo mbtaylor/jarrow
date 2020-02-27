@@ -6,6 +6,7 @@
 JAVA_HOME = /mbt/local/java/jdk1.6.0_41/bin
 JAVAC = $(JAVA_HOME)/javac
 JAVADOC = $(JAVA_HOME)/javadoc
+VERSION = 1.0
 
 SRCDIR = java/uk/ac/bristol/star
 FBSDIR = $(SRCDIR)/fbs
@@ -105,6 +106,7 @@ $(JARFILE): $(JSRC) $(FBSRC) $(FBFEATHERSRC)
 	mkdir -p tmp
 	$(JAVAC) -Xlint:all,-serial,-path -d tmp \
               $(JSRC) $(FBSRC) $(FBFEATHERSRC) \
+            && echo $(VERSION) > tmp/uk/ac/bristol/star/feather/jarrow.version \
             && jar cf $@ -C tmp .
 	rm -rf tmp
 
